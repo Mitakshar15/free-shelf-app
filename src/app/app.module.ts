@@ -1,18 +1,28 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
+
+// Services
+import { AuthService } from './services/auth.service';
+import { UserService } from './services/user.service';
+import { StorageSpaceService } from './services/storage-space.service';
+import { BookingService } from './services/booking.service';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  declarations: [],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+    AuthService,
+    UserService,
+    StorageSpaceService,
+    BookingService
+  ]
 })
 export class AppModule { }
+

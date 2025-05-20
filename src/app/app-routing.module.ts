@@ -1,7 +1,26 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-const routes: Routes = [];
+// Components
+import { HomeComponent } from './pages/home/home.component';
+import { SignupComponent } from './components/auth/signup/signup.component';
+import { LoginComponent } from './components/auth/login/login.component';
+
+// Guards
+import { authGuard } from './guards/auth.guard';
+import { nonAuthGuard } from './guards/non-auth.guard';
+
+export const routes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 'signup', component: SignupComponent, canActivate: [nonAuthGuard] },
+  { path: 'login', component: LoginComponent, canActivate: [nonAuthGuard] },
+  // Protected routes will be added as they are implemented
+  // { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
+  // { path: 'bookings', component: BookingsComponent, canActivate: [authGuard] },
+  // { path: 'spaces/my', component: MySpacesComponent, canActivate: [authGuard] },
+  // Add more routes as needed
+  { path: '**', redirectTo: '' } // Redirect to home for any undefined routes
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

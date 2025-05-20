@@ -1,0 +1,191 @@
+<div class="auth-container">
+  <div class="auth-header">
+    <h2 class="auth-title">
+      Create your account
+    </h2>
+    <p class="auth-subtitle">
+      Already have an account?
+      <a routerLink="/login" class="text-primary">
+        Sign in
+      </a>
+    </p>
+  </div>
+
+  <div class="auth-form-container">
+    <div class="auth-form-wrapper card">
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="auth-form">
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <!-- Username -->
+        <div class="form-group">
+          <label for="username" class="form-label">
+            Username
+          </label>
+          <div>
+            <input id="username" name="username" type="text" formControlName="username" autocomplete="username" required
+              class="form-control"
+              [ngClass]="{'is-invalid': signupForm.get('username')?.invalid && signupForm.get('username')?.touched}">
+          </div>
+          <div *ngIf="signupForm.get('username')?.invalid && signupForm.get('username')?.touched" class="form-error">
+            <span *ngIf="signupForm.get('username')?.errors?.['required']">Username is required</span>
+            <span *ngIf="signupForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</span>
+          </div>
+        </div>
+
+        <!-- First Name and Last Name -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName" class="form-label">
+              First name
+            </label>
+            <div>
+              <input id="firstName" name="firstName" type="text" formControlName="firstName" autocomplete="given-name" required
+                class="form-control"
+                [ngClass]="{'is-invalid': signupForm.get('firstName')?.invalid && signupForm.get('firstName')?.touched}">
+            </div>
+            <div *ngIf="signupForm.get('firstName')?.invalid && signupForm.get('firstName')?.touched" class="form-error">
+              First name is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="lastName" class="form-label">
+              Last name
+            </label>
+            <div>
+              <input id="lastName" name="lastName" type="text" formControlName="lastName" autocomplete="family-name" required
+                class="form-control"
+                [ngClass]="{'is-invalid': signupForm.get('lastName')?.invalid && signupForm.get('lastName')?.touched}">
+            </div>
+            <div *ngIf="signupForm.get('lastName')?.invalid && signupForm.get('lastName')?.touched" class="form-error">
+              Last name is required
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email" class="form-label">
+            Email address
+          </label>
+          <div>
+            <input id="email" name="email" type="email" formControlName="email" autocomplete="email" required
+              class="form-control"
+              [ngClass]="{'is-invalid': signupForm.get('email')?.invalid && signupForm.get('email')?.touched}">
+          </div>
+          <div *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched" class="form-error">
+            <span *ngIf="signupForm.get('email')?.errors?.['required']">Email is required</span>
+            <span *ngIf="signupForm.get('email')?.errors?.['email']">Please enter a valid email address</span>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password" class="form-label">
+            Password
+          </label>
+          <div class="password-field">
+            <input id="password" [type]="passwordVisible ? 'text' : 'password'" formControlName="password" autocomplete="new-password" required
+              class="form-control"
+              [ngClass]="{'is-invalid': signupForm.get('password')?.invalid && signupForm.get('password')?.touched}">
+            <button type="button" (click)="togglePasswordVisibility()" class="password-toggle">
+              <svg *ngIf="!passwordVisible" xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <svg *ngIf="passwordVisible" xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+              </svg>
+            </button>
+          </div>
+          <div *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched" class="form-error">
+            <span *ngIf="signupForm.get('password')?.errors?.['required']">Password is required</span>
+            <span *ngIf="signupForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters</span>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+          <label for="confirmPassword" class="form-label">
+            Confirm password
+          </label>
+          <div class="password-field">
+            <input id="confirmPassword" [type]="confirmPasswordVisible ? 'text' : 'password'" formControlName="confirmPassword" autocomplete="new-password" required
+              class="form-control"
+              [ngClass]="{'is-invalid': signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched}">
+            <button type="button" (click)="toggleConfirmPasswordVisibility()" class="password-toggle">
+              <svg *ngIf="!confirmPasswordVisible" xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <svg *ngIf="confirmPasswordVisible" xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+              </svg>
+            </button>
+          </div>
+          <div *ngIf="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched" class="form-error">
+            <span *ngIf="signupForm.get('confirmPassword')?.errors?.['required']">Please confirm your password</span>
+            <span *ngIf="signupForm.get('confirmPassword')?.errors?.['mismatch']">Passwords do not match</span>
+          </div>
+        </div>
+
+        <!-- User Role -->
+        <div class="form-group">
+          <label class="form-label">
+            I want to
+          </label>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input id="renter" name="role" type="radio" formControlName="role" value="RENTER" class="radio-input">
+              <label for="renter" class="radio-label">
+                Find storage space (Renter)
+              </label>
+            </div>
+            <div class="radio-option">
+              <input id="host" name="role" type="radio" formControlName="role" value="HOST" class="radio-input">
+              <label for="host" class="radio-label">
+                Rent out my space (Host)
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <button type="submit" [disabled]="isSubmitting" class="btn btn-primary w-full">
+            <span *ngIf="isSubmitting" class="spinner">
+              <svg class="spinner-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </span>
+            <span>Sign up</span>
+          </button>
+        </div>
+      </form>
+
+      <div class="auth-divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">
+          <span>Or continue with</span>
+        </div>
+      </div>
+
+      <div class="social-login">
+        <button type="button" class="btn btn-outline w-full">
+          <svg class="social-icon google" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+            <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
+              <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z"/>
+              <path fill="#34A853" d="M -14.754 63.239 C -11.514 63.239 -8.804 62.159 -6.824 60.329 L -10.684 57.329 C -11.764 58.049 -13.134 58.489 -14.754 58.489 C -17.884 58.489 -20.534 56.379 -21.484 53.529 L -25.464 53.529 L -25.464 56.619 C -23.494 60.539 -19.444 63.239 -14.754 63.239 Z"/>
+              <path fill="#FBBC05" d="M -21.484 53.529 C -21.734 52.809 -21.864 52.039 -21.864 51.239 C -21.864 50.439 -21.724 49.669 -21.484 48.949 L -21.484 45.859 L -25.464 45.859 C -26.284 47.479 -26.754 49.299 -26.754 51.239 C -26.754 53.179 -26.284 54.999 -25.464 56.619 L -21.484 53.529 Z"/>
+              <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z"/>
+            </g>
+          </svg>
+          Sign up with Google
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

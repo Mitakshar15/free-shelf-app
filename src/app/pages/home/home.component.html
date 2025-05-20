@@ -1,0 +1,212 @@
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title">Find storage space near you or rent out your extra space</h1>
+      <p class="hero-subtitle">Free Shelf connects people with extra space to those who need storage solutions.</p>
+      
+      <!-- Search Form -->
+      <form (ngSubmit)="searchSpaces($event)" class="hero-search-form">
+        <input type="text" placeholder="Enter your location" class="form-control">
+        <button type="submit" class="btn btn-primary">
+          Find Space
+        </button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Wave Divider -->
+  <div class="wave-divider">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="w-full h-auto">
+      <path fill="#ffffff" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,138.7C960,139,1056,117,1152,117.3C1248,117,1344,139,1392,149.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+    </svg>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="section bg-light">
+  <div class="container">
+    <div class="section-header text-center">
+      <h2 class="section-title">How Free Shelf Works</h2>
+      <p class="section-subtitle">Simple, secure, and convenient storage solutions for everyone.</p>
+    </div>
+    
+    <div class="flex flex-wrap">
+      <!-- Step 1 -->
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3 class="step-title">Find the perfect space</h3>
+        <p class="step-description">Browse available storage spaces near you and find the one that fits your needs and budget.</p>
+      </div>
+      
+      <!-- Step 2 -->
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3 class="step-title">Book securely online</h3>
+        <p class="step-description">Reserve your space with our secure booking system. No hidden fees or complicated contracts.</p>
+      </div>
+      
+      <!-- Step 3 -->
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3 class="step-title">Store your belongings</h3>
+        <p class="step-description">Move in your items on the agreed date and enjoy affordable, convenient storage.</p>
+      </div>
+    </div>
+    
+    <div class="cta-buttons text-center">
+      <a routerLink="/spaces" class="btn btn-primary">
+        Find Storage Space
+      </a>
+      <a routerLink="/host" class="btn btn-outline ml-4">
+        Become a Host
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Spaces Section -->
+<section class="section bg-light">
+  <div class="container">
+    <div class="section-header text-center">
+      <h2 class="section-title">Featured Storage Spaces</h2>
+      <p class="section-subtitle">Discover top-rated storage spaces in your area.</p>
+    </div>
+    
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loader-container">
+      <div class="loader"></div>
+    </div>
+    
+    <!-- Error State -->
+    <div *ngIf="error" class="error-container text-center">
+      <p class="text-danger mb-4">{{ error }}</p>
+      <button (click)="loadFeaturedSpaces()" class="btn btn-primary">
+        Try Again
+      </button>
+    </div>
+    
+    <!-- Spaces Grid -->
+    <div *ngIf="!isLoading && !error && featuredSpaces.length > 0" class="spaces-grid">
+      <div *ngFor="let space of featuredSpaces" class="space-card card">
+        <!-- Space Image -->
+        <div class="space-image">
+          <img *ngIf="space.images && space.images.length > 0" [src]="space.images[0].imageUrl" alt="{{ space.title }}" class="space-img">
+          <div *ngIf="!space.images || space.images.length === 0" class="space-no-image">
+            <span>No image available</span>
+          </div>
+          <div class="space-price">
+            ${{ space.pricePerMonth }}/month
+          </div>
+        </div>
+        
+        <!-- Space Details -->
+        <div class="card-body">
+          <h3 class="space-title">{{ space.title }}</h3>
+          <p class="space-location">{{ space.address?.city }}, {{ space.address?.state }}</p>
+          <div class="space-features">
+            <span class="space-size">{{ space.sizeInSquareFeet }} sq ft</span>
+            <span class="space-type">{{ space.spaceType | titlecase }}</span>
+          </div>
+          <p class="space-description">{{ space.description }}</p>
+          <a [routerLink]="['/spaces', space.id]" class="btn btn-primary w-full">
+            View Details
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- No Spaces Found -->
+    <div *ngIf="!isLoading && !error && featuredSpaces.length === 0" class="empty-state text-center">
+      <p class="mb-4">No storage spaces available at the moment.</p>
+      <a routerLink="/spaces" class="btn btn-primary">
+        Browse All Spaces
+      </a>
+    </div>
+    
+    <div *ngIf="!isLoading && featuredSpaces.length > 0" class="view-all-container text-center">
+      <a routerLink="/spaces" class="btn btn-primary">
+        View All Spaces
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="section bg-white">
+  <div class="container">
+    <div class="section-header text-center">
+      <h2 class="section-title">What Our Users Say</h2>
+      <p class="section-subtitle">Hear from people who have found the perfect storage solution with Free Shelf.</p>
+    </div>
+    
+    <div class="testimonials-container">
+      <!-- Testimonial 1 -->
+      <div class="testimonial-card">
+        <div class="testimonial-header">
+          <div class="testimonial-avatar">
+            JD
+          </div>
+          <div class="testimonial-user">
+            <h4 class="testimonial-name">John Doe</h4>
+            <p class="testimonial-role">Renter</p>
+          </div>
+        </div>
+        <p class="testimonial-text">"I needed temporary storage during my move and found the perfect garage space just two blocks away. The process was seamless and much cheaper than commercial storage units."</p>
+        <div class="testimonial-rating">
+          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+        </div>
+      </div>
+      
+      <!-- Testimonial 2 -->
+      <div class="testimonial-card">
+        <div class="testimonial-header">
+          <div class="testimonial-avatar">
+            JS
+          </div>
+          <div class="testimonial-user">
+            <h4 class="testimonial-name">Jane Smith</h4>
+            <p class="testimonial-role">Host</p>
+          </div>
+        </div>
+        <p class="testimonial-text">"I've been renting out my basement storage area and making an extra $300 a month. The platform makes it easy to manage bookings and communicate with renters."</p>
+        <div class="testimonial-rating">
+          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+        </div>
+      </div>
+      
+      <!-- Testimonial 3 -->
+      <div class="testimonial-card">
+        <div class="testimonial-header">
+          <div class="testimonial-avatar">
+            RJ
+          </div>
+          <div class="testimonial-user">
+            <h4 class="testimonial-name">Robert Johnson</h4>
+            <p class="testimonial-role">Renter</p>
+          </div>
+        </div>
+        <p class="testimonial-text">"As a college student, I needed affordable storage during summer break. Free Shelf helped me find a secure attic space at half the price of storage facilities near campus."</p>
+        <div class="testimonial-rating">
+          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-title">Ready to find your storage solution?</h2>
+    <p class="cta-subtitle">Join thousands of people who have found the perfect storage space or earned extra income by renting out their unused space.</p>
+    <div class="cta-buttons">
+      <a routerLink="/spaces" class="btn btn-light">
+        Find Storage Space
+      </a>
+      <a routerLink="/host" class="btn btn-outline-light">
+        Become a Host
+      </a>
+    </div>
+  </div>
+</section>

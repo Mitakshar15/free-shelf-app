@@ -1,7 +1,20 @@
-import { platformBrowser } from '@angular/platform-browser';
-import { AppModule } from './app/app.module';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { AppComponent } from './app/app.component';
+import { provideRouter } from '@angular/router';
+import { routes } from './app/app-routing.module';
+import { AuthService } from './app/services/auth.service';
+import { UserService } from './app/services/user.service';
+import { StorageSpaceService } from './app/services/storage-space.service';
+import { BookingService } from './app/services/booking.service';
+import { provideHttpClient } from '@angular/common/http';
 
-platformBrowser().bootstrapModule(AppModule, {
-  ngZoneEventCoalescing: true,
-})
-  .catch(err => console.error(err));
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideRouter(routes),
+    provideHttpClient(),
+    AuthService,
+    UserService,
+    StorageSpaceService,
+    BookingService
+  ]
+}).catch(err => console.error(err));
