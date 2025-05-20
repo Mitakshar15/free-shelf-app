@@ -26,8 +26,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    // Initial check of auth status
-    this.checkAuthStatus();
+    // Initial check of auth status - don't load profile here, it will be loaded by the subscription
+    this.isAuthenticated = this.authService.isAuthenticated();
     
     // Subscribe to auth state changes
     this.authSubscription = this.authService.authState$.subscribe(isAuthenticated => {
@@ -47,22 +47,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
   }
 
-  checkAuthStatus(): void {
-    this.isAuthenticated = this.authService.isAuthenticated();
-    if (this.isAuthenticated) {
-      this.loadUserProfile();
-    }
-  }
+  // checkAuthStatus method removed to avoid redundant API calls
 
   loadUserProfile(): void {
+    console.log('NavbarComponent - Loading user profile');
     this.userService.getUserProfile().subscribe({
       next: (response) => {
+        console.log('NavbarComponent - User profile loaded successfully');
         if (response.data) {
           this.user = response.data;
         }
       },
       error: (error) => {
-        console.error('Error loading user profile', error);
+        console.error('NavbarComponent - Error loading user profile', error);
         // If unauthorized, clear token
         if (error.status === 401) {
           this.authService.logout();
