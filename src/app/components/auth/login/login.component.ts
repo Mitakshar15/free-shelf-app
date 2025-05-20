@@ -18,6 +18,7 @@ export class LoginComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   passwordVisible = false;
+  private oauthListener: any;
   
   constructor(
     private fb: FormBuilder,
@@ -33,10 +34,15 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Check if user just registered successfully
+    // Check if user just registered successfully or has OAuth token
     this.route.queryParams.subscribe(params => {
       if (params['registered'] === 'success') {
         this.successMessage = 'Registration successful! Please log in with your credentials.';
+      }
+      
+      // Handle OAuth callback with token
+      if (params['token']) {
+        this.handleOAuthCallback(params['token']);
       }
     });
 
@@ -44,10 +50,69 @@ export class LoginComponent implements OnInit {
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['/']);
     }
+    
+    // Set up listener for OAuth completion event
+    this.oauthListener = this.handleOAuthComplete.bind(this);
+    window.addEventListener('oauth-complete', this.oauthListener);
+  }
+  
+  ngOnDestroy(): void {
+    // Clean up the event listener when component is destroyed
+    if (this.oauthListener) {
+      window.removeEventListener('oauth-complete', this.oauthListener);
+    }
   }
 
   togglePasswordVisibility() {
     this.passwordVisible = !this.passwordVisible;
+  }
+  
+  /**
+   * Initiates Google OAuth authentication flow
+   */
+  signInWithGoogle(): void {
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.isSubmitting = true;
+    
+    // Display instructions to the user
+    this.successMessage = 'A popup window will open for Google authentication. After signing in, you will need to copy the JSON response and paste it back here.';
+    
+    // Initiate the OAuth flow
+    this.authService.initiateGoogleAuth();
+  }
+  
+  /**
+   * Handles OAuth callback with token
+   */
+  handleOAuthCallback(token: string): void {
+    this.authService.handleOAuthCallback(token);
+    this.successMessage = 'Successfully signed in with Google!';
+    
+    // Redirect to home page or the originally requested URL after a short delay
+    setTimeout(() => {
+      const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+      this.router.navigateByUrl(returnUrl);
+    }, 1000);
+  }
+  
+  /**
+   * Handles the OAuth completion event
+   */
+  private handleOAuthComplete(event: CustomEvent): void {
+    this.isSubmitting = false;
+    
+    if (event.detail?.success) {
+      this.successMessage = `Successfully signed in with ${event.detail.provider}!`;
+      
+      // Redirect to home page or the originally requested URL after a short delay
+      setTimeout(() => {
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+        this.router.navigateByUrl(returnUrl);
+      }, 1500);
+    } else {
+      this.errorMessage = event.detail?.error || 'Authentication failed. Please try again.';
+    }
   }
 
   markFormGroupTouched(formGroup: FormGroup) {

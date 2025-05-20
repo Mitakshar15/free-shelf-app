@@ -14,6 +14,7 @@ import { CookieService } from './cookie.service';
 })
 export class AuthService {
   private apiUrl = 'http://localhost:8080/v1/auth';
+  private oauthUrl = 'http://localhost:8080/oauth2/authorize';
   private tokenKey = 'free-shelf-token';
   private authStateSubject = new BehaviorSubject<boolean>(false);
   
@@ -81,5 +82,52 @@ export class AuthService {
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
+  }
+
+  /**
+   * Initiates the Google OAuth2 authentication flow
+   */
+  initiateGoogleAuth(): void {
+    // Create a unique state parameter to prevent CSRF attacks
+    const state = this.generateRandomState();
+    // Store state in localStorage to verify when the user returns
+    localStorage.setItem('oauth_state', state);
+    
+    // Construct the full OAuth URL with redirect back to our application
+    const redirectUri = encodeURIComponent(`${window.location.origin}/oauth/callback`);
+    const oauthUrl = `${this.oauthUrl}/google?redirect_uri=${redirectUri}&state=${state}`;
+    
+    // Redirect to the OAuth provider
+    window.location.href = oauthUrl;
+  }
+  
+  /**
+   * Generates a random state parameter for OAuth security
+   */
+  private generateRandomState(): string {
+    return Math.random().toString(36).substring(2, 15) + 
+           Math.random().toString(36).substring(2, 15);
+  }
+  
+  /**
+   * Verifies the OAuth state parameter to prevent CSRF attacks
+   */
+  verifyOAuthState(state: string): boolean {
+    const savedState = localStorage.getItem('oauth_state');
+    // Clear the saved state regardless of match
+    localStorage.removeItem('oauth_state');
+    // Return whether the states match
+    return savedState === state;
+  }
+
+  /**
+   * Handles the OAuth2 callback and stores the token
+   * @param token The authentication token received from the OAuth provider
+   */
+  handleOAuthCallback(token: string): void {
+    if (token) {
+      this.setToken(token);
+      this.authStateSubject.next(true);
+    }
   }
 }
