@@ -1,0 +1,168 @@
+<div class="addresses-container">
+  <div class="section-header">
+    <h2>Your Addresses</h2>
+    <button *ngIf="!isAddingAddress && !isEditingAddress" (click)="startAddAddress()" class="btn-add">
+      <i class="add-icon"></i>
+      Add New Address
+    </button>
+  </div>
+
+  <div *ngIf="successMessage" class="success-message">
+    <p>{{ successMessage }}</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Add/Edit Address Form -->
+  <div *ngIf="isAddingAddress || isEditingAddress" class="address-form-container">
+    <h3>{{ isAddingAddress ? 'Add New Address' : 'Edit Address' }}</h3>
+    <form [formGroup]="addressForm" (ngSubmit)="onSubmitAddress()">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="addressLine1">Address Line 1*</label>
+          <input 
+            type="text" 
+            id="addressLine1" 
+            formControlName="addressLine1"
+            class="form-control"
+            [ngClass]="{'invalid': addressForm.get('addressLine1')?.invalid && addressForm.get('addressLine1')?.touched}"
+          >
+          <div *ngIf="addressForm.get('addressLine1')?.invalid && addressForm.get('addressLine1')?.touched" class="error-text">
+            Address line 1 is required
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="addressLine2">Address Line 2</label>
+          <input 
+            type="text" 
+            id="addressLine2" 
+            formControlName="addressLine2"
+            class="form-control"
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="street">Street</label>
+        <input 
+          type="text" 
+          id="street" 
+          formControlName="street"
+          class="form-control"
+        >
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="city">City*</label>
+          <input 
+            type="text" 
+            id="city" 
+            formControlName="city"
+            class="form-control"
+            [ngClass]="{'invalid': addressForm.get('city')?.invalid && addressForm.get('city')?.touched}"
+          >
+          <div *ngIf="addressForm.get('city')?.invalid && addressForm.get('city')?.touched" class="error-text">
+            City is required
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="state">State/Province*</label>
+          <input 
+            type="text" 
+            id="state" 
+            formControlName="state"
+            class="form-control"
+            [ngClass]="{'invalid': addressForm.get('state')?.invalid && addressForm.get('state')?.touched}"
+          >
+          <div *ngIf="addressForm.get('state')?.invalid && addressForm.get('state')?.touched" class="error-text">
+            State is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="zipCode">Zip/Postal Code*</label>
+          <input 
+            type="text" 
+            id="zipCode" 
+            formControlName="zipCode"
+            class="form-control"
+            [ngClass]="{'invalid': addressForm.get('zipCode')?.invalid && addressForm.get('zipCode')?.touched}"
+          >
+          <div *ngIf="addressForm.get('zipCode')?.invalid && addressForm.get('zipCode')?.touched" class="error-text">
+            Zip code is required
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="country">Country*</label>
+          <input 
+            type="text" 
+            id="country" 
+            formControlName="country"
+            class="form-control"
+            [ngClass]="{'invalid': addressForm.get('country')?.invalid && addressForm.get('country')?.touched}"
+          >
+          <div *ngIf="addressForm.get('country')?.invalid && addressForm.get('country')?.touched" class="error-text">
+            Country is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="btn-cancel" 
+          (click)="isAddingAddress ? cancelAddAddress() : cancelEditAddress()"
+        >
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          class="btn-save" 
+          [disabled]="addressForm.invalid || isSubmitting"
+        >
+          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          {{ isAddingAddress ? 'Add Address' : 'Save Changes' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Address List -->
+  <div *ngIf="!isAddingAddress && !isEditingAddress" class="address-list">
+    <div *ngIf="addresses.length === 0" class="empty-state">
+      <div class="empty-icon"></div>
+      <p>You don't have any addresses yet</p>
+      <button (click)="startAddAddress()" class="btn-add-empty">Add your first address</button>
+    </div>
+
+    <div *ngFor="let address of addresses" class="address-card">
+      <div class="address-content">
+        <div class="address-icon"></div>
+        <div class="address-details">
+          <div class="address-line">{{ address.addressLine1 }}</div>
+          <div *ngIf="address.addressLine2" class="address-line">{{ address.addressLine2 }}</div>
+          <div *ngIf="address.street" class="address-line">{{ address.street }}</div>
+          <div class="address-line">
+            {{ address.city }}, {{ address.state }} {{ address.zipCode }}
+          </div>
+          <div class="address-line">{{ address.country }}</div>
+        </div>
+      </div>
+      <div class="address-actions">
+        <button (click)="startEditAddress(address)" class="btn-edit-address">
+          <i class="edit-icon"></i>
+          Edit
+        </button>
+        <button (click)="deleteAddress(address.id!)" class="btn-delete-address">
+          <i class="delete-icon"></i>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

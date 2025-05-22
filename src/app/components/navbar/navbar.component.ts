@@ -16,7 +16,6 @@ import { Subscription } from 'rxjs';
 export class NavbarComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   user: User | null = null;
-  isMenuOpen = false;
   private authSubscription: Subscription = new Subscription();
 
   constructor(
@@ -70,9 +69,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     });
   }
 
-  toggleMenu(): void {
-    this.isMenuOpen = !this.isMenuOpen;
-  }
+
 
   logout(): void {
     // Clear token using AuthService
@@ -83,7 +80,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.user = null;
     
     // Close menu
-    this.isMenuOpen = false;
     
     // Redirect to login page
     this.router.navigate(['/login']);

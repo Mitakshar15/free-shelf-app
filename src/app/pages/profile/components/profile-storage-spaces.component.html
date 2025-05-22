@@ -1,0 +1,69 @@
+<div class="storage-spaces-container">
+  <div class="section-header">
+    <h2>Your Storage Spaces</h2>
+    <button (click)="navigateToAddSpace()" class="btn-add">
+      <i class="add-icon"></i>
+      Add New Space
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading your storage spaces...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <p>{{ error }}</p>
+    <button class="btn-retry" (click)="loadStorageSpaces()">Retry</button>
+  </div>
+
+  <div *ngIf="!isLoading && !error" class="storage-spaces-content">
+    <div *ngIf="storageSpaces.length === 0" class="empty-state">
+      <div class="empty-icon"></div>
+      <p>You don't have any storage spaces yet</p>
+      <button (click)="navigateToAddSpace()" class="btn-add-empty">Create your first storage space</button>
+    </div>
+
+    <div *ngIf="storageSpaces.length > 0" class="storage-spaces-grid">
+      <div *ngFor="let space of storageSpaces" class="space-card">
+        <div class="space-image">
+          <img 
+            [src]="getSpaceImageUrl(space) | imageUrl" 
+            [alt]="space.title"
+          >
+          <div class="space-status" [ngClass]="getStatusClass(space.status)">
+            {{ space.status }}
+          </div>
+        </div>
+        <div class="space-content">
+          <h3 class="space-title">{{ space.title }}</h3>
+          <div class="space-type">{{ getSpaceTypeLabel(space.spaceType) }}</div>
+          <div class="space-info">
+            <div class="space-info-item">
+              <i class="info-icon size-icon"></i>
+              <span>{{ space.sizeInSquareFeet }} sq ft</span>
+            </div>
+            <div class="space-info-item">
+              <i class="info-icon price-icon"></i>
+              <span>{{ formatPrice(space.pricePerMonth) }}</span>
+            </div>
+          </div>
+          <div class="space-location" *ngIf="space.address">
+            <i class="location-icon"></i>
+            <span>{{ space.address.city }}, {{ space.address.state }}</span>
+          </div>
+          <div class="space-availability" *ngIf="space.availabilityPeriod">
+            <div class="availability-label">Available:</div>
+            <div class="availability-dates">
+              {{ formatDate(space.availabilityPeriod.startDate) }} - {{ formatDate(space.availabilityPeriod.endDate) }}
+            </div>
+          </div>
+          <div class="space-actions">
+            <a [routerLink]="['/spaces', space.id]" class="btn-view">View Details</a>
+            <a [routerLink]="['/host', 'edit', space.id]" class="btn-edit">Edit</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

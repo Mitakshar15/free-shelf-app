@@ -39,7 +39,19 @@
 
       <!-- Authenticated -->
       <div *ngIf="isAuthenticated" class="user-menu">
-        <div class="user-avatar" (click)="toggleMenu()">
+        <div class="nav-icons">
+          <a routerLink="/bookings" class="nav-icon-link" title="Your Bookings">
+            <i class="nav-icon bookings-icon"></i>
+          </a>
+          <a routerLink="/spaces/my" class="nav-icon-link" title="Your Spaces">
+            <i class="nav-icon spaces-icon"></i>
+          </a>
+          <a (click)="logout()" class="nav-icon-link" title="Sign out">
+            <i class="nav-icon logout-icon"></i>
+          </a>
+        </div>
+        
+        <a routerLink="/profile" class="user-avatar">
           <div *ngIf="user?.profile?.profileImageUrl; else defaultAvatar" class="avatar-image">
             <img [src]="user?.profile?.profileImageUrl" alt="User profile">
           </div>
@@ -48,53 +60,21 @@
               {{ user?.firstName?.charAt(0) || user?.email?.charAt(0) | uppercase }}
             </div>
           </ng-template>
-          <div class="avatar-indicator"></div>
-        </div>
-
-        <!-- Dropdown menu -->
-        <div *ngIf="isMenuOpen" class="dropdown-menu">
-          <div class="dropdown-user-info">
-            <div class="dropdown-user-name">{{ user?.firstName }} {{ user?.lastName }}</div>
-            <div class="dropdown-user-email">{{ user?.email }}</div>
-          </div>
-          <div class="dropdown-divider"></div>
-          <a routerLink="/profile" class="dropdown-item">
-            <i class="dropdown-icon profile-icon"></i>
-            Your Profile
-          </a>
-          <a routerLink="/bookings" class="dropdown-item">
-            <i class="dropdown-icon bookings-icon"></i>
-            Your Bookings
-          </a>
-          <a routerLink="/spaces/my" class="dropdown-item">
-            <i class="dropdown-icon spaces-icon"></i>
-            Your Spaces
-          </a>
-          <div class="dropdown-divider"></div>
-          <a (click)="logout()" class="dropdown-item cursor-pointer">
-            <i class="dropdown-icon logout-icon"></i>
-            Sign out
-          </a>
-        </div>
+        </a>
       </div>
     </div>
 
     <!-- Mobile menu button -->
-    <button class="navbar-toggle" (click)="toggleMenu()" type="button" aria-controls="mobile-menu" aria-expanded="false">
+    <button class="navbar-toggle" type="button" aria-controls="mobile-menu" aria-expanded="false">
       <span class="sr-only">Open main menu</span>
-      <!-- Icon when menu is closed -->
-      <svg *ngIf="!isMenuOpen" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+      <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-      <!-- Icon when menu is open -->
-      <svg *ngIf="isMenuOpen" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>
   </div>
 
   <!-- Mobile menu -->
-  <div *ngIf="isMenuOpen" class="mobile-menu">
+  <div class="mobile-menu">
     <div>
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="mobile-nav-link">Home</a>
       <a routerLink="/spaces" routerLinkActive="active" class="mobile-nav-link">Find Spaces</a>

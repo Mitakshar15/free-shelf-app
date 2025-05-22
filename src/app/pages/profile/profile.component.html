@@ -1,0 +1,60 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1>Your Profile</h1>
+    <p class="profile-subtitle">Manage your personal information, addresses, and storage spaces</p>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading your profile...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <p>{{ error }}</p>
+    <button class="btn-retry" (click)="loadUserProfile()">Retry</button>
+  </div>
+
+  <div *ngIf="!isLoading && !error" class="profile-content">
+    <div class="profile-tabs">
+      <button 
+        [class.active]="activeTab === 'basic-details'" 
+        (click)="setActiveTab('basic-details')"
+        class="tab-button">
+        <i class="tab-icon user-icon"></i>
+        Basic Details
+      </button>
+      <button 
+        [class.active]="activeTab === 'addresses'" 
+        (click)="setActiveTab('addresses')"
+        class="tab-button">
+        <i class="tab-icon location-icon"></i>
+        Addresses
+      </button>
+      <button 
+        [class.active]="activeTab === 'storage-spaces'" 
+        (click)="setActiveTab('storage-spaces')"
+        class="tab-button">
+        <i class="tab-icon storage-icon"></i>
+        Storage Spaces
+      </button>
+    </div>
+
+    <div class="tab-content">
+      <app-profile-basic-details 
+        *ngIf="activeTab === 'basic-details'" 
+        [user]="user"
+        (profileUpdated)="onProfileUpdated($event)">
+      </app-profile-basic-details>
+
+      <app-profile-addresses 
+        *ngIf="activeTab === 'addresses'" 
+        [addresses]="addresses"
+        (addressesUpdated)="onAddressesUpdated()">
+      </app-profile-addresses>
+
+      <app-profile-storage-spaces 
+        *ngIf="activeTab === 'storage-spaces'">
+      </app-profile-storage-spaces>
+    </div>
+  </div>
+</div>

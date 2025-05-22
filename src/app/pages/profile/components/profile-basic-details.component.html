@@ -1,0 +1,137 @@
+<div class="basic-details-container">
+  <div class="section-header">
+    <h2>Basic Details</h2>
+    <button *ngIf="!isEditing" (click)="toggleEdit()" class="btn-edit">
+      <i class="edit-icon"></i>
+      Edit
+    </button>
+    <button *ngIf="isEditing" (click)="toggleEdit()" class="btn-cancel">
+      Cancel
+    </button>
+  </div>
+
+  <div *ngIf="successMessage" class="success-message">
+    <p>{{ successMessage }}</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- View mode -->
+  <div *ngIf="!isEditing" class="profile-view">
+    <div class="profile-info">
+      <div class="profile-avatar">
+        <img *ngIf="user?.profile?.profileImageUrl" [src]="user?.profile?.profileImageUrl" alt="Profile picture">
+        <div *ngIf="!user?.profile?.profileImageUrl" class="avatar-placeholder">
+          {{ user?.firstName?.charAt(0) || user?.email?.charAt(0) | uppercase }}
+        </div>
+      </div>
+      <div class="profile-details">
+        <div class="profile-name">
+          {{ user?.firstName }} {{ user?.lastName }}
+        </div>
+        <div class="profile-email">
+          {{ user?.email }}
+        </div>
+        <div class="profile-role">
+          <span class="role-badge" *ngFor="let role of user?.roles">{{ role }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-bio">
+      <h3>Bio</h3>
+      <p *ngIf="user?.profile?.bio">{{ user?.profile?.bio }}</p>
+      <p *ngIf="!user?.profile?.bio" class="empty-field">No bio provided</p>
+    </div>
+
+    <div class="profile-additional">
+      <div class="profile-field">
+        <span class="field-label">Username:</span>
+        <span class="field-value">{{ user?.userName }}</span>
+      </div>
+      <div class="profile-field">
+        <span class="field-label">Phone Number:</span>
+        <span class="field-value">{{ user?.phoneNumber || 'Not provided' }}</span>
+      </div>
+      <div class="profile-field">
+        <span class="field-label">Account Status:</span>
+        <span class="field-value status-badge" [ngClass]="user?.status?.toLowerCase()">{{ user?.status }}</span>
+      </div>
+      <div class="profile-field">
+        <span class="field-label">Last Login:</span>
+        <span class="field-value">{{ (user?.lastLoginAt | date:'medium') || 'Not available' }}</span>
+      </div>
+      <div class="profile-field">
+        <span class="field-label">Account Verified:</span>
+        <span class="field-value">{{ user?.accountVerified ? 'Yes' : 'No' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit mode -->
+  <div *ngIf="isEditing" class="profile-edit">
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="firstName">First Name*</label>
+        <input 
+          type="text" 
+          id="firstName" 
+          formControlName="firstName"
+          class="form-control"
+          [ngClass]="{'invalid': profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched}"
+        >
+        <div *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched" class="error-text">
+          First name is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <input 
+          type="text" 
+          id="lastName" 
+          formControlName="lastName"
+          class="form-control"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="profileImageUrl">Profile Image URL</label>
+        <input 
+          type="text" 
+          id="profileImageUrl" 
+          formControlName="profileImageUrl"
+          class="form-control"
+          placeholder="https://example.com/your-image.jpg"
+        >
+        <div class="image-preview" *ngIf="profileForm.get('profileImageUrl')?.value">
+          <img [src]="profileForm.get('profileImageUrl')?.value" alt="Profile image preview">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="bio">Bio</label>
+        <textarea 
+          id="bio" 
+          formControlName="bio"
+          class="form-control"
+          rows="4"
+          placeholder="Tell us about yourself..."
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="btn-save" 
+          [disabled]="profileForm.invalid || isSubmitting"
+        >
+          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
