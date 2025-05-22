@@ -91,7 +91,7 @@
       <div *ngFor="let space of featuredSpaces" class="space-card card">
         <!-- Space Image -->
         <div class="space-image">
-          <img *ngIf="space.images && space.images.length > 0" [src]="space.images[0].imageUrl" alt="{{ space.title }}" class="space-img">
+          <img *ngIf="space.images && space.images.length > 0" [src]="space.images[0].imageUrl | imageUrl" alt="{{ space.title }}" class="space-img">
           <div *ngIf="!space.images || space.images.length === 0" class="space-no-image">
             <span>No image available</span>
           </div>

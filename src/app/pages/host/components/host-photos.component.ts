@@ -3,6 +3,8 @@ import { StorageSpaceService } from '../../../services/storage-space.service';
 import { SpaceImage } from '../../../models/models';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImageUrlPipe } from '../../../pipes/image-url.pipe';
+import { ImageProxyService } from '../../../services/image-proxy.service';
 
 @Component({
   selector: 'app-host-photos',
@@ -11,7 +13,11 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    ImageUrlPipe
+  ],
+  providers: [
+    ImageProxyService
   ]
 })
 export class HostPhotosComponent implements OnInit {
@@ -27,7 +33,10 @@ export class HostPhotosComponent implements OnInit {
   success = '';
   uploading = false;
   
-  constructor(private storageSpaceService: StorageSpaceService) { }
+  constructor(
+    private storageSpaceService: StorageSpaceService,
+    private imageProxyService: ImageProxyService
+  ) { }
 
   ngOnInit(): void {
     const spaceId = localStorage.getItem('currentStorageSpaceId');

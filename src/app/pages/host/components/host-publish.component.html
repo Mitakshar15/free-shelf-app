@@ -34,7 +34,7 @@
               class="preview-image-thumbnail"
               [class.active]="image.primary"
             >
-              <img [src]="image.imageUrl" [alt]="image.caption || 'Storage space image'">
+              <img [src]="image.imageUrl | imageUrl" [alt]="image.caption || 'Storage space image'">
             </div>
           </div>
         </div>

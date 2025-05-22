@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { StorageSpaceService } from '../../../services/storage-space.service';
 import { StorageSpace } from '../../../models/models';
 import { CommonModule, DatePipe } from '@angular/common';
+import { ImageUrlPipe } from '../../../pipes/image-url.pipe';
+import { ImageProxyService } from '../../../services/image-proxy.service';
 
 @Component({
   selector: 'app-host-publish',
@@ -11,7 +13,11 @@ import { CommonModule, DatePipe } from '@angular/common';
   standalone: true,
   imports: [
     CommonModule,
-    DatePipe
+    DatePipe,
+    ImageUrlPipe
+  ],
+  providers: [
+    ImageProxyService
   ]
 })
 export class HostPublishComponent implements OnInit {
@@ -26,7 +32,8 @@ export class HostPublishComponent implements OnInit {
   
   constructor(
     private storageSpaceService: StorageSpaceService,
-    private router: Router
+    private router: Router,
+    private imageProxyService: ImageProxyService
   ) { }
 
   ngOnInit(): void {
@@ -103,7 +110,10 @@ export class HostPublishComponent implements OnInit {
     }
     
     const primaryImage = this.storageSpace.images.find(img => img.primary);
-    return primaryImage ? primaryImage.imageUrl : this.storageSpace.images[0].imageUrl;
+    const imageUrl = primaryImage ? primaryImage.imageUrl : this.storageSpace.images[0].imageUrl;
+    
+    // Convert file system path to web-accessible URL
+    return this.imageProxyService.getImageUrlSync(imageUrl);
   }
   
   /**

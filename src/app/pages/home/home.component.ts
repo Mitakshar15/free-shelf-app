@@ -3,13 +3,16 @@ import { Router, RouterModule, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StorageSpaceService } from '../../services/storage-space.service';
 import { StorageSpace } from '../../models/models';
+import { ImageUrlPipe } from '../../pipes/image-url.pipe';
+import { ImageProxyService } from '../../services/image-proxy.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
   standalone: true,
-  imports: [CommonModule, RouterModule, RouterLink]
+  imports: [CommonModule, RouterModule, RouterLink, ImageUrlPipe],
+  providers: [ImageProxyService]
 })
 export class HomeComponent implements OnInit {
   featuredSpaces: StorageSpace[] = [];

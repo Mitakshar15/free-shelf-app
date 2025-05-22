@@ -1,0 +1,129 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ImageProxyService {
+  private readonly API_URL = 'http://localhost:8080'; // Base API URL
+  private readonly IMAGE_CACHE = new Map<string, SafeUrl>();
+  
+  constructor(
+    private http: HttpClient,
+    private sanitizer: DomSanitizer
+  ) { }
+  
+  /**
+   * Converts a file system path to a web-accessible URL
+   * @param path The file system path to convert
+   * @returns A safe URL that can be used in an img src attribute
+   */
+  getImageUrl(path: string): Observable<SafeUrl> {
+    // If path is already a web URL, return it as is
+    if (!path) {
+      return of(this.sanitizer.bypassSecurityTrustUrl('assets/images/placeholder.png'));
+    }
+    
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return of(this.sanitizer.bypassSecurityTrustUrl(path));
+    }
+    
+    // If we have this path cached, return the cached URL
+    if (this.IMAGE_CACHE.has(path)) {
+      return of(this.IMAGE_CACHE.get(path)!);
+    }
+    
+    // Convert the file system path to a web-accessible URL
+    const webUrl = this.convertToWebUrl(path);
+    
+    // Create a safe URL and cache it
+    const safeUrl = this.sanitizer.bypassSecurityTrustUrl(webUrl);
+    this.IMAGE_CACHE.set(path, safeUrl);
+    
+    return of(safeUrl);
+  }
+  
+  /**
+   * Synchronously converts a file system path to a web-accessible URL
+   * @param path The file system path to convert
+   * @returns A URL string that can be used in an img src attribute
+   */
+  getImageUrlSync(path: string): string {
+    // If path is null or undefined, return placeholder
+    if (!path) {
+      return 'assets/images/placeholder.png';
+    }
+    
+    // If path is already a web URL, return it as is
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
+    
+    // Convert the file system path to a web-accessible URL
+    return this.convertToWebUrl(path);
+  }
+  
+  /**
+   * Converts a file system path to a web-accessible URL
+   * @param path The file system path to convert
+   * @returns A URL string
+   */
+  private convertToWebUrl(path: string): string {
+    // Log the original path for debugging
+    console.log('Original image path:', path);
+    
+    // Extract the file name from the path
+    const fileName = path.split('/').pop();
+    
+    if (!fileName) {
+      console.error('Could not extract filename from path:', path);
+      return 'assets/images/placeholder.png';
+    }
+    
+    // Try to extract the space ID using different patterns
+    let spaceId: string | null = null;
+    
+    // Pattern 1: /home/mitakshar/FreeShelf/uploads/spaces/6/images/filename.png
+    let matches = path.match(/\/uploads\/spaces\/(\d+)\/images\//);
+    if (matches && matches[1]) {
+      spaceId = matches[1];
+    }
+    
+    // Pattern 2: /spaces/6/images/filename.png
+    if (!spaceId) {
+      matches = path.match(/\/spaces\/(\d+)\/images\//);
+      if (matches && matches[1]) {
+        spaceId = matches[1];
+      }
+    }
+    
+    // Pattern 3: Look for any number between slashes followed by /images/
+    if (!spaceId) {
+      matches = path.match(/\/(\d+)\/images\//);
+      if (matches && matches[1]) {
+        spaceId = matches[1];
+      }
+    }
+    
+    // If we couldn't extract a space ID, use a direct approach
+    if (!spaceId) {
+      console.warn('Could not extract space ID from path, using direct file serving:', path);
+      // Create a URL that directly serves the file from the server
+      // This assumes your backend has an endpoint to serve static files
+      return `${this.API_URL}/v1/files/images/${fileName}`;
+    }
+    
+    // Log the extracted information for debugging
+    console.log('Extracted space ID:', spaceId);
+    console.log('Extracted filename:', fileName);
+    
+    // Construct the API URL to fetch the image
+    const imageUrl = `${this.API_URL}/v1/storage-spaces/${spaceId}/images/${fileName}`;
+    console.log('Generated image URL:', imageUrl);
+    
+    return imageUrl;
+  }
+}
