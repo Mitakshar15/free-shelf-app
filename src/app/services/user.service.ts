@@ -19,7 +19,8 @@ export class UserService {
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    
   ) { }
 
   getUserProfile(): Observable<ApiResponse<User>> {
@@ -28,6 +29,7 @@ export class UserService {
       { headers: this.authService.getAuthHeaders() }
     );
   }
+  
 
   updateUserProfile(updateProfileRequest: UpdateProfileRequest): Observable<ApiResponse<any>> {
     return this.http.put<ApiResponse<any>>(

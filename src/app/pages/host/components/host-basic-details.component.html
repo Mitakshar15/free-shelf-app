@@ -1,0 +1,191 @@
+<div class="basic-details-container">
+  <h2>Basic Details</h2>
+  <p class="section-description">Tell us about your storage space</p>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+  <form [formGroup]="basicDetailsForm" (ngSubmit)="onSubmit()">
+    <div class="form-section">
+      <h3>Space Information</h3>
+      
+      <div class="form-group">
+        <label for="title">Title*</label>
+        <input 
+          type="text" 
+          id="title" 
+          formControlName="title" 
+          class="form-control" 
+          placeholder="E.g., Spacious Garage in Downtown"
+          [class.is-invalid]="basicDetailsForm.get('title')?.invalid && basicDetailsForm.get('title')?.touched"
+        >
+        <div class="invalid-feedback" *ngIf="basicDetailsForm.get('title')?.errors?.['required'] && basicDetailsForm.get('title')?.touched">
+          Title is required
+        </div>
+        <div class="invalid-feedback" *ngIf="basicDetailsForm.get('title')?.errors?.['maxlength'] && basicDetailsForm.get('title')?.touched">
+          Title cannot exceed 100 characters
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description*</label>
+        <textarea 
+          id="description" 
+          formControlName="description" 
+          class="form-control" 
+          rows="4" 
+          placeholder="Describe your space, including access details, security features, etc."
+          [class.is-invalid]="basicDetailsForm.get('description')?.invalid && basicDetailsForm.get('description')?.touched"
+        ></textarea>
+        <div class="invalid-feedback" *ngIf="basicDetailsForm.get('description')?.errors?.['required'] && basicDetailsForm.get('description')?.touched">
+          Description is required
+        </div>
+        <div class="invalid-feedback" *ngIf="basicDetailsForm.get('description')?.errors?.['maxlength'] && basicDetailsForm.get('description')?.touched">
+          Description cannot exceed 2000 characters
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="pricePerMonth">Price per Month ($)*</label>
+          <input 
+            type="number" 
+            id="pricePerMonth" 
+            formControlName="pricePerMonth" 
+            class="form-control" 
+            placeholder="0.00"
+            min="0"
+            step="0.01"
+            [class.is-invalid]="basicDetailsForm.get('pricePerMonth')?.invalid && basicDetailsForm.get('pricePerMonth')?.touched"
+          >
+          <div class="invalid-feedback" *ngIf="basicDetailsForm.get('pricePerMonth')?.errors?.['required'] && basicDetailsForm.get('pricePerMonth')?.touched">
+            Price is required
+          </div>
+          <div class="invalid-feedback" *ngIf="basicDetailsForm.get('pricePerMonth')?.errors?.['min'] && basicDetailsForm.get('pricePerMonth')?.touched">
+            Price must be a positive number
+          </div>
+        </div>
+
+        <div class="form-group col-md-6">
+          <label for="sizeInSquareFeet">Size (sq ft)*</label>
+          <input 
+            type="number" 
+            id="sizeInSquareFeet" 
+            formControlName="sizeInSquareFeet" 
+            class="form-control" 
+            placeholder="0"
+            min="0"
+            step="0.1"
+            [class.is-invalid]="basicDetailsForm.get('sizeInSquareFeet')?.invalid && basicDetailsForm.get('sizeInSquareFeet')?.touched"
+          >
+          <div class="invalid-feedback" *ngIf="basicDetailsForm.get('sizeInSquareFeet')?.errors?.['required'] && basicDetailsForm.get('sizeInSquareFeet')?.touched">
+            Size is required
+          </div>
+          <div class="invalid-feedback" *ngIf="basicDetailsForm.get('sizeInSquareFeet')?.errors?.['min'] && basicDetailsForm.get('sizeInSquareFeet')?.touched">
+            Size must be a positive number
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="spaceType">Space Type*</label>
+        <select 
+          id="spaceType" 
+          formControlName="spaceType" 
+          class="form-control"
+          [class.is-invalid]="basicDetailsForm.get('spaceType')?.invalid && basicDetailsForm.get('spaceType')?.touched"
+        >
+          <option value="" disabled>Select a space type</option>
+          <option *ngFor="let type of spaceTypes" [value]="type.value">{{ type.label }}</option>
+        </select>
+        <div class="invalid-feedback" *ngIf="basicDetailsForm.get('spaceType')?.errors?.['required'] && basicDetailsForm.get('spaceType')?.touched">
+          Space type is required
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Location</h3>
+      
+      <div class="form-group">
+        <label for="addressId">Address*</label>
+        <select 
+          id="addressId" 
+          formControlName="addressId" 
+          class="form-control"
+          [class.is-invalid]="basicDetailsForm.get('addressId')?.invalid && basicDetailsForm.get('addressId')?.touched"
+        >
+          <option value="" disabled>Select an address</option>
+          <option *ngFor="let address of addresses" [value]="address.id">
+            {{ address.addressLine1 }}, {{ address.city }}, {{ address.state }} {{ address.zipCode }}
+          </option>
+        </select>
+        <div class="invalid-feedback" *ngIf="basicDetailsForm.get('addressId')?.errors?.['required'] && basicDetailsForm.get('addressId')?.touched">
+          Address is required
+        </div>
+        <div *ngIf="addresses.length === 0" class="mt-2">
+          <p class="text-warning">No addresses found. Please add an address in your profile first.</p>
+          <a routerLink="/profile" class="btn btn-outline-primary btn-sm">Go to Profile</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Availability Period</h3>
+      
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="startDate">Available From*</label>
+          <input 
+            type="date" 
+            id="startDate" 
+            formControlName="startDate" 
+            class="form-control"
+            [min]="minStartDate"
+            [class.is-invalid]="basicDetailsForm.get('startDate')?.invalid && basicDetailsForm.get('startDate')?.touched"
+          >
+          <div class="invalid-feedback" *ngIf="basicDetailsForm.get('startDate')?.errors?.['required'] && basicDetailsForm.get('startDate')?.touched">
+            Start date is required
+          </div>
+        </div>
+
+        <div class="form-group col-md-6">
+          <label for="endDate">Available Until*</label>
+          <input 
+            type="date" 
+            id="endDate" 
+            formControlName="endDate" 
+            class="form-control"
+            [min]="minEndDate"
+            [class.is-invalid]="basicDetailsForm.get('endDate')?.invalid && basicDetailsForm.get('endDate')?.touched"
+          >
+          <div class="invalid-feedback" *ngIf="basicDetailsForm.get('endDate')?.errors?.['required'] && basicDetailsForm.get('endDate')?.touched">
+            End date is required
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Features</h3>
+      <p class="section-description">Select all features that apply to your space</p>
+      
+      <div class="features-grid">
+        <div *ngFor="let feature of features" class="feature-item" [class.selected]="feature.checked" (click)="toggleFeature(feature)">
+          <div class="feature-checkbox">
+            <input type="checkbox" [checked]="feature.checked" (click)="$event.stopPropagation()">
+            <span class="checkmark"></span>
+          </div>
+          <span class="feature-label">{{ feature.label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="loading">
+        <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+        Continue to Photos
+      </button>
+    </div>
+  </form>
+</div>

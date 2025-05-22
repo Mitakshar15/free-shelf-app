@@ -1,0 +1,38 @@
+<div class="host-container">
+  <div class="host-header">
+    <h1>Host a Storage Space</h1>
+    <p>Share your unused space and earn extra income</p>
+  </div>
+
+  <div class="stepper">
+    <div class="step" [class.active]="currentStep === 1" (click)="goToStep(1)">
+      <div class="step-number">1</div>
+      <div class="step-label">Basic Details</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step" [class.active]="currentStep === 2" [class.completed]="currentStep > 2" (click)="currentStep > 1 ? goToStep(2) : null">
+      <div class="step-number">2</div>
+      <div class="step-label">Upload Photos</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step" [class.active]="currentStep === 3" [class.completed]="currentStep > 3" (click)="currentStep > 2 ? goToStep(3) : null">
+      <div class="step-number">3</div>
+      <div class="step-label">Publish</div>
+    </div>
+  </div>
+
+  <!-- Step 1: Basic Details -->
+  <div *ngIf="currentStep === 1">
+    <app-host-basic-details (nextStep)="nextStep()"></app-host-basic-details>
+  </div>
+
+  <!-- Step 2: Photos -->
+  <div *ngIf="currentStep === 2">
+    <app-host-photos (nextStep)="nextStep()" (previousStep)="previousStep()"></app-host-photos>
+  </div>
+
+  <!-- Step 3: Publish -->
+  <div *ngIf="currentStep === 3">
+    <app-host-publish (previousStep)="previousStep()"></app-host-publish>
+  </div>
+</div>

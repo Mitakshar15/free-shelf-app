@@ -5,6 +5,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { SignupComponent } from './components/auth/signup/signup.component';
 import { LoginComponent } from './components/auth/login/login.component';
+import { HostComponent } from './pages/host/host.component';
 
 // Guards
 import { authGuard } from './guards/auth.guard';
@@ -14,6 +15,7 @@ export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'signup', component: SignupComponent, canActivate: [nonAuthGuard] },
   { path: 'login', component: LoginComponent, canActivate: [nonAuthGuard] },
+  { path: 'host', component: HostComponent, canActivate: [authGuard] },
   // Protected routes will be added as they are implemented
   // { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   // { path: 'bookings', component: BookingsComponent, canActivate: [authGuard] },

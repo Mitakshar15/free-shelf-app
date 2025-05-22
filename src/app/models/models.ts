@@ -182,7 +182,7 @@ export interface CreateStorageSpaceRequest {
   spaceType: 'GARAGE' | 'BASEMENT' | 'ATTIC' | 'STORAGE_UNIT' | 'ROOM' | 'SHED' | 'OTHER';
   addressId: number;
   features?: StorageSpaceFeature[];
-  availabilityPeriod?: {
+  availabilityPeriod: {
     startDate: string;
     endDate: string;
   };

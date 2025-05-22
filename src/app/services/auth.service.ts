@@ -5,7 +5,8 @@ import { tap, map } from 'rxjs/operators';
 import { 
   SignUpRequest, 
   SignInRequest, 
-  ApiResponse 
+  ApiResponse, 
+  User
 } from '../models/models';
 import { CookieService } from './cookie.service';
 
@@ -88,6 +89,7 @@ export class AuthService {
     console.log('AuthService - isAuthenticated checking token:', token ? 'Token exists' : 'No token found');
     return !!token;
   }
+
   
   /**
    * Check authentication status directly from the backend
@@ -185,5 +187,19 @@ export class AuthService {
     } else {
       console.log('AuthService - OAuth callback received empty token');
     }
+  }
+
+  /**
+   * Get the current user information from the backend
+   * @returns Observable with the current user data
+   */
+  getCurrentUser(): Observable<User | null> {
+    return this.http.get<ApiResponse<User>>(`${this.apiUrl}/user`, this.getAuthOptions())
+      .pipe(
+        map(response => {
+          console.log('AuthService - getCurrentUser response:', response);
+          return response && response.data ? response.data : null;
+        })
+      );
   }
 }

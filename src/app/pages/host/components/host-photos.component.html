@@ -1,0 +1,121 @@
+<div class="photos-container">
+  <h2>Upload Photos</h2>
+  <p class="section-description">Add photos of your storage space (up to 5 images)</p>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+  <div *ngIf="!storageSpaceId" class="no-space-warning">
+    <p>No storage space found. Please go back and create a space first.</p>
+    <button class="btn btn-secondary" (click)="onBack()">Go Back</button>
+  </div>
+
+  <div *ngIf="storageSpaceId">
+    <!-- Current Images Section -->
+    <div class="form-section" *ngIf="images.length > 0">
+      <h3>Current Images</h3>
+      <p class="section-description">Select an image to set as the primary image for your listing</p>
+      
+      <div class="image-grid">
+        <div *ngFor="let image of images" class="image-card" [class.primary]="image.primary">
+          <div class="image-wrapper">
+            <img [src]="image.imageUrl" [alt]="image.caption || 'Storage space image'">
+            <div class="image-overlay">
+              <button 
+                *ngIf="!image.primary" 
+                class="btn btn-sm btn-light set-primary-btn" 
+                (click)="setAsPrimary(image.id!)" 
+                [disabled]="loading"
+              >
+                Set as Primary
+              </button>
+              <span *ngIf="image.primary" class="primary-badge">Primary</span>
+            </div>
+          </div>
+          <div class="image-caption" *ngIf="image.caption">{{ image.caption }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload New Images Section -->
+    <div class="form-section">
+      <h3>Upload New Images</h3>
+      <p class="section-description">Add high-quality photos to showcase your space</p>
+      
+      <div class="upload-area" *ngIf="images.length < 5">
+        <input 
+          type="file" 
+          id="file-upload" 
+          multiple 
+          accept="image/*" 
+          (change)="onFileSelected($event)" 
+          [disabled]="uploading"
+          class="file-input"
+        >
+        <label for="file-upload" class="file-upload-label">
+          <div class="upload-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <span>Click to select images</span>
+          <span class="upload-hint">or drag and drop files here</span>
+        </label>
+      </div>
+      
+      <div *ngIf="images.length >= 5" class="max-images-notice">
+        <p>You have reached the maximum limit of 5 images.</p>
+      </div>
+
+      <!-- Selected Files Preview -->
+      <div *ngIf="selectedFiles.length > 0" class="selected-files">
+        <h4>Selected Images</h4>
+        
+        <div class="selected-files-grid">
+          <div *ngFor="let file of selectedFiles; let i = index" class="selected-file-card">
+            <div class="selected-file-preview">
+              <img [src]="file ? createObjectURL(file) : ''" alt="Preview">
+              <button type="button" class="remove-file-btn" (click)="removeSelectedFile(i)">×</button>
+            </div>
+            <div class="selected-file-info">
+              <div class="file-name">{{ file.name }}</div>
+              <input 
+                type="text" 
+                class="form-control caption-input" 
+                placeholder="Add a caption (optional)" 
+                [value]="captions[i] || ''" 
+                (input)="updateCaption(i, $event)"
+              >
+            </div>
+          </div>
+        </div>
+        
+        <div class="upload-actions">
+          <button 
+            class="btn btn-primary" 
+            (click)="uploadImages()" 
+            [disabled]="uploading || selectedFiles.length === 0"
+          >
+            <span *ngIf="uploading" class="spinner-border spinner-border-sm mr-1"></span>
+            Upload Images
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-outline-secondary" (click)="onBack()">Back</button>
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        (click)="onContinue()" 
+        [disabled]="loading || uploading"
+      >
+        <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+        Continue to Publish
+      </button>
+    </div>
+  </div>
+</div>

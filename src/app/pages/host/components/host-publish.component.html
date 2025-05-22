@@ -1,0 +1,125 @@
+<div class="publish-container">
+  <h2>Publish Your Space</h2>
+  <p class="section-description">Review your listing details before publishing</p>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+  <div *ngIf="!storageSpaceId" class="no-space-warning">
+    <p>No storage space found. Please go back and create a space first.</p>
+    <button class="btn btn-secondary" (click)="onBack()">Go Back</button>
+  </div>
+
+  <div *ngIf="loading" class="loading-indicator">
+    <div class="spinner-border"></div>
+    <p>Loading your space details...</p>
+  </div>
+
+  <div *ngIf="storageSpace && !loading" class="space-preview">
+    <div class="form-section">
+      <h3>Space Preview</h3>
+      <p class="section-description">Here's how your listing will appear to potential renters</p>
+
+      <div class="preview-card">
+        <div class="preview-images" *ngIf="hasImages()">
+          <div class="preview-image-main">
+            <img 
+              [src]="getPrimaryImageUrl()" 
+              [alt]="storageSpace?.title || 'Storage space'"
+            >
+          </div>
+          <div class="preview-image-thumbnails" *ngIf="hasMultipleImages()">
+            <div 
+              *ngFor="let image of storageSpace?.images?.slice(0, 4)" 
+              class="preview-image-thumbnail"
+              [class.active]="image.primary"
+            >
+              <img [src]="image.imageUrl" [alt]="image.caption || 'Storage space image'">
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-content">
+          <h3 class="preview-title">{{ storageSpace?.title }}</h3>
+          <p class="preview-location">{{ storageSpace?.address }}</p>
+          <p class="preview-price">${{ storageSpace?.pricePerMonth }}/month</p>
+          
+          <div class="preview-details">
+            <div class="preview-detail">
+              <span class="detail-label">Size</span>
+              <span class="detail-value">{{ storageSpace?.sizeInSquareFeet }} sq ft</span>
+            </div>
+          </div>
+          
+          <div class="preview-description">{{ storageSpace?.description }}</div>
+          
+          <div class="preview-location" *ngIf="storageSpace?.address">
+            <h5>Location</h5>
+            <p>
+              {{ storageSpace?.address?.addressLine1 }}, 
+              {{ storageSpace?.address?.city }}, 
+              {{ storageSpace?.address?.state }} 
+              {{ storageSpace?.address?.zipCode }}
+            </p>
+          </div>
+          
+          <div class="preview-availability" *ngIf="storageSpace?.availabilityPeriod">
+            <h5>Availability</h5>
+            <p>
+              From {{ storageSpace?.availabilityPeriod?.startDate | date:'yyyy-MM-ddTHH:mm:ss.SSSXXX' }} 
+              to {{ storageSpace?.availabilityPeriod?.endDate | date:'yyyy-MM-ddTHH:mm:ss.SSSXXX' }}
+            </p>
+          </div>
+          
+          <div class="preview-features" *ngIf="hasFeatures()">
+            <h5>Features</h5>
+            <div class="features-list">
+              <span *ngFor="let feature of storageSpace?.features" class="feature-tag">
+                {{ getFeatureLabel(feature) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Publish Your Space</h3>
+      <p class="section-description">
+        Once published, your space will be visible to potential renters. You can edit or unpublish it at any time.
+      </p>
+      
+      <div class="publish-notice">
+        <div class="notice-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <div class="notice-content">
+          <h5>Before you publish</h5>
+          <ul>
+            <li>Ensure all information is accurate and up-to-date</li>
+            <li>Upload high-quality images that showcase your space</li>
+            <li>Set a competitive price based on your location and amenities</li>
+            <li>Be prepared to respond to booking requests</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-outline-secondary" (click)="onBack()">Back to Photos</button>
+      <button 
+        type="button" 
+        class="btn btn-success" 
+        (click)="publishSpace()" 
+        [disabled]="publishing"
+      >
+        <span *ngIf="publishing" class="spinner-border spinner-border-sm mr-1"></span>
+        Publish Now
+      </button>
+    </div>
+  </div>
+</div>
