@@ -27,17 +27,45 @@ export class HostComponent implements OnInit {
   constructor(
     private router: Router,
     private authService: AuthService,
-    private userService: UserService
   ) { }
 
   ngOnInit(): void {
-    // Check if user is a HOST
+    // Check if user has HOST role, but only redirect if we're certain they don't
     this.authService.getCurrentUser().subscribe(user => {
-      if (!user || !user.role || user.role !== 'HOST') {
-        // Redirect non-HOST users to become a host page
-        this.router.navigate(['/become-host']);
+      if (user) {
+        // We have a user, check if they have HOST role
+        const isHost = this.hasHostRole(user);
+        
+        if (!isHost) {
+          console.log('User does not have HOST role, redirecting to become-host page');
+          this.router.navigate(['/become-host']);
+        } else {
+          console.log('User has HOST role, staying on host page');
+        }
+      } else {
+        // If we don't have a user yet, don't redirect - the auth service will handle retries
+        console.log('No user data yet, waiting for auth service to retry');
       }
     });
+  }
+  
+  /**
+   * Check if the user has the HOST role
+   * @param user The user to check
+   * @returns true if the user has the HOST role, false otherwise
+   */
+  private hasHostRole(user: any): boolean {
+    // Check the roles array first (new API format)
+    if (user.roles && Array.isArray(user.roles)) {
+      return user.roles.includes('HOST');
+    }
+    
+    // Fallback to the role property (old format)
+    if (user.role) {
+      return user.role === 'HOST';
+    }
+    
+    return false;
   }
 
   nextStep(): void {

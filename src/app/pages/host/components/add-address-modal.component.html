@@ -1,0 +1,148 @@
+<div class="modal-backdrop" (click)="close()"></div>
+<div class="modal-container">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h4>Add New Address</h4>
+      <button type="button" class="close-button" (click)="close()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+      <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+      
+      <form [formGroup]="addressForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="addressLine1">Address Line 1*</label>
+          <input 
+            type="text" 
+            id="addressLine1" 
+            formControlName="addressLine1" 
+            class="form-control" 
+            placeholder="Street address, P.O. box, company name"
+            [class.is-invalid]="addressForm.get('addressLine1')?.invalid && addressForm.get('addressLine1')?.touched"
+          >
+          <div class="invalid-feedback" *ngIf="addressForm.get('addressLine1')?.errors?.['required'] && addressForm.get('addressLine1')?.touched">
+            Address line 1 is required
+          </div>
+          <div class="invalid-feedback" *ngIf="addressForm.get('addressLine1')?.errors?.['maxlength'] && addressForm.get('addressLine1')?.touched">
+            Address line 1 cannot exceed 100 characters
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="addressLine2">Address Line 2</label>
+          <input 
+            type="text" 
+            id="addressLine2" 
+            formControlName="addressLine2" 
+            class="form-control" 
+            placeholder="Apartment, suite, unit, building, floor, etc."
+            [class.is-invalid]="addressForm.get('addressLine2')?.invalid && addressForm.get('addressLine2')?.touched"
+          >
+          <div class="invalid-feedback" *ngIf="addressForm.get('addressLine2')?.errors?.['maxlength'] && addressForm.get('addressLine2')?.touched">
+            Address line 2 cannot exceed 100 characters
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="street">Street</label>
+          <input 
+            type="text" 
+            id="street" 
+            formControlName="street" 
+            class="form-control" 
+            placeholder="Street name"
+            [class.is-invalid]="addressForm.get('street')?.invalid && addressForm.get('street')?.touched"
+          >
+          <div class="invalid-feedback" *ngIf="addressForm.get('street')?.errors?.['maxlength'] && addressForm.get('street')?.touched">
+            Street cannot exceed 100 characters
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="city">City*</label>
+            <input 
+              type="text" 
+              id="city" 
+              formControlName="city" 
+              class="form-control" 
+              placeholder="City"
+              [class.is-invalid]="addressForm.get('city')?.invalid && addressForm.get('city')?.touched"
+            >
+            <div class="invalid-feedback" *ngIf="addressForm.get('city')?.errors?.['required'] && addressForm.get('city')?.touched">
+              City is required
+            </div>
+            <div class="invalid-feedback" *ngIf="addressForm.get('city')?.errors?.['maxlength'] && addressForm.get('city')?.touched">
+              City cannot exceed 50 characters
+            </div>
+          </div>
+          
+          <div class="form-group col-md-6">
+            <label for="state">State/Province*</label>
+            <input 
+              type="text" 
+              id="state" 
+              formControlName="state" 
+              class="form-control" 
+              placeholder="State/Province"
+              [class.is-invalid]="addressForm.get('state')?.invalid && addressForm.get('state')?.touched"
+            >
+            <div class="invalid-feedback" *ngIf="addressForm.get('state')?.errors?.['required'] && addressForm.get('state')?.touched">
+              State is required
+            </div>
+            <div class="invalid-feedback" *ngIf="addressForm.get('state')?.errors?.['maxlength'] && addressForm.get('state')?.touched">
+              State cannot exceed 50 characters
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="zipCode">Zip/Postal Code*</label>
+            <input 
+              type="text" 
+              id="zipCode" 
+              formControlName="zipCode" 
+              class="form-control" 
+              placeholder="Zip/Postal code"
+              [class.is-invalid]="addressForm.get('zipCode')?.invalid && addressForm.get('zipCode')?.touched"
+            >
+            <div class="invalid-feedback" *ngIf="addressForm.get('zipCode')?.errors?.['required'] && addressForm.get('zipCode')?.touched">
+              Zip code is required
+            </div>
+            <div class="invalid-feedback" *ngIf="addressForm.get('zipCode')?.errors?.['maxlength'] && addressForm.get('zipCode')?.touched">
+              Zip code cannot exceed 10 characters
+            </div>
+          </div>
+          
+          <div class="form-group col-md-6">
+            <label for="country">Country*</label>
+            <input 
+              type="text" 
+              id="country" 
+              formControlName="country" 
+              class="form-control" 
+              placeholder="Country"
+              [class.is-invalid]="addressForm.get('country')?.invalid && addressForm.get('country')?.touched"
+            >
+            <div class="invalid-feedback" *ngIf="addressForm.get('country')?.errors?.['required'] && addressForm.get('country')?.touched">
+              Country is required
+            </div>
+            <div class="invalid-feedback" *ngIf="addressForm.get('country')?.errors?.['maxlength'] && addressForm.get('country')?.touched">
+              Country cannot exceed 50 characters
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="close()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+            Add Address
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

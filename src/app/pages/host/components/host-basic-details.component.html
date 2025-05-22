@@ -109,23 +109,27 @@
       
       <div class="form-group">
         <label for="addressId">Address*</label>
-        <select 
-          id="addressId" 
-          formControlName="addressId" 
-          class="form-control"
-          [class.is-invalid]="basicDetailsForm.get('addressId')?.invalid && basicDetailsForm.get('addressId')?.touched"
-        >
-          <option value="" disabled>Select an address</option>
-          <option *ngFor="let address of addresses" [value]="address.id">
-            {{ address.addressLine1 }}, {{ address.city }}, {{ address.state }} {{ address.zipCode }}
-          </option>
-        </select>
+        <div class="address-selection-container">
+          <select 
+            id="addressId" 
+            formControlName="addressId" 
+            class="form-control"
+            [class.is-invalid]="basicDetailsForm.get('addressId')?.invalid && basicDetailsForm.get('addressId')?.touched"
+          >
+            <option value="" disabled>Select an address</option>
+            <option *ngFor="let address of addresses" [value]="address.id">
+              {{ address.addressLine1 }}, {{ address.city }}, {{ address.state }} {{ address.zipCode }}
+            </option>
+          </select>
+          <button type="button" class="btn btn-outline-primary add-address-btn" (click)="openAddAddressModal()">
+            <i class="fa fa-plus"></i> Add New Address
+          </button>
+        </div>
         <div class="invalid-feedback" *ngIf="basicDetailsForm.get('addressId')?.errors?.['required'] && basicDetailsForm.get('addressId')?.touched">
           Address is required
         </div>
         <div *ngIf="addresses.length === 0" class="mt-2">
-          <p class="text-warning">No addresses found. Please add an address in your profile first.</p>
-          <a routerLink="/profile" class="btn btn-outline-primary btn-sm">Go to Profile</a>
+          <p class="text-warning">No addresses found. Please add a new address using the button above.</p>
         </div>
       </div>
     </div>
@@ -189,3 +193,10 @@
     </div>
   </form>
 </div>
+
+<!-- Add Address Modal -->
+<app-add-address-modal 
+  *ngIf="showAddAddressModal" 
+  (closeModal)="closeAddAddressModal()" 
+  (addressAdded)="handleAddressAdded()"
+></app-add-address-modal>

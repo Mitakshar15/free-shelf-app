@@ -1,12 +1,14 @@
 // User related models
 export interface User {
   firstName: string;
-  lastName: string;
+  lastName?: string;
   email: string;
   userName: string;
   phoneNumber?: string;
   status: 'PENDING' | 'ACTIVE' | 'SUSPENDED' | 'DEACTIVATED';
-  role: 'HOST' | 'RENTER' | 'ADMIN';
+  // Changed from single role to roles array to match the API response
+  roles?: ('HOST' | 'RENTER' | 'ADMIN')[];
+  role?: 'HOST' | 'RENTER' | 'ADMIN'; // Keep for backward compatibility
   profile?: UserProfile;
   lastLoginAt?: string;
   accountVerified?: boolean;

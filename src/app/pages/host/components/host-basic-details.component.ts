@@ -5,6 +5,7 @@ import { UserService } from '../../../services/user.service';
 import { Address, CreateStorageSpaceRequest, StorageSpaceFeature } from '../../../models/models';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AddAddressModalComponent } from './add-address-modal.component';
 
 @Component({
   selector: 'app-host-basic-details',
@@ -14,7 +15,8 @@ import { CommonModule } from '@angular/common';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    AddAddressModalComponent
   ]
 })
 export class HostBasicDetailsComponent implements OnInit {
@@ -25,6 +27,7 @@ export class HostBasicDetailsComponent implements OnInit {
   loading = false;
   error = '';
   success = '';
+  showAddAddressModal = false;
   
   spaceTypes = [
     { value: 'GARAGE', label: 'Garage' },
@@ -77,6 +80,11 @@ export class HostBasicDetailsComponent implements OnInit {
       next: (response) => {
         if (response.data) {
           this.addresses = response.data;
+          
+          // If addresses are available, select the first one by default
+          if (this.addresses.length > 0 && !this.basicDetailsForm.get('addressId')?.value) {
+            this.basicDetailsForm.get('addressId')?.setValue(this.addresses[0].id);
+          }
         }
       },
       error: (err) => {
@@ -84,6 +92,19 @@ export class HostBasicDetailsComponent implements OnInit {
         console.error('Error loading addresses:', err);
       }
     });
+  }
+  
+  openAddAddressModal(): void {
+    this.showAddAddressModal = true;
+  }
+  
+  closeAddAddressModal(): void {
+    this.showAddAddressModal = false;
+  }
+  
+  handleAddressAdded(): void {
+    // Reload the addresses list
+    this.loadUserAddresses();
   }
 
   onSubmit(): void {
