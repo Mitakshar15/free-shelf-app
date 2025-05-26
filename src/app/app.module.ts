@@ -9,9 +9,12 @@ import { AuthService } from './services/auth.service';
 import { UserService } from './services/user.service';
 import { StorageSpaceService } from './services/storage-space.service';
 import { BookingService } from './services/booking.service';
+import { OauthSelectRoleComponent } from './components/auth/oauth-select-role/oauth-select-role/oauth-select-role.component';
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    OauthSelectRoleComponent
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,

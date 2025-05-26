@@ -9,12 +9,13 @@ import {
   User
 } from '../models/models';
 import { CookieService } from './cookie.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:8080/v1'
+  public baseUrl = 'http://localhost:8080/v1'
   private apiUrl = 'http://localhost:8080/v1/auth';
   private oauthUrl = 'http://localhost:8080/oauth2/authorize';
   private tokenKey = 'free-shelf-token';
@@ -25,10 +26,33 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private router: Router  
   ) {
     // Initialize auth state based on token existence
     this.authStateSubject.next(this.isAuthenticated());
+
+    this.getCurrentUser().subscribe(user => {
+      if (user) {
+        const hasUnassignedRole = user.roles && user.roles.includes('UNASSIGNED');
+        
+        // Check if user needs to select roles
+        if (hasUnassignedRole) {
+          // If at home or oauth callback, redirect to role selection
+          if (window.location.pathname === '/home' || 
+              window.location.pathname === '/oauth/callback') {
+            console.log('User has UNASSIGNED role, redirecting to role selection');
+            this.router.navigate(['/select-role']);
+          }
+        } else {
+          // If at role selection page and user already has roles, redirect to home
+          if (window.location.pathname === '/select-role') {
+            console.log('User already has roles, redirecting to home');
+            this.router.navigate(['/home']);
+          }
+        }
+      }
+    });
   }
 
   signUp(signUpRequest: SignUpRequest): Observable<ApiResponse<any>> {
@@ -262,4 +286,29 @@ export class AuthService {
         })
       );
   }
+
+  setUserRoles(roles: any): Observable<any> {
+
+    const token = this.getToken();
+    if (!token) {
+      throw new Error('Authentication token not found');
+    }
+    
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.put<ApiResponse<any>>(`${this.baseUrl}/v1/user/role`, {}, {
+      headers: headers,
+      params: roles
+    }).pipe(
+      tap(response => {
+        if (response) {
+           console.log("ROLE ASSIGNED")
+        }
+      })
+    );
+  }
+
+
 }

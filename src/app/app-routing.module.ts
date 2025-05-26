@@ -11,6 +11,7 @@ import { ProfileComponent } from './pages/profile/profile.component';
 // Guards
 import { authGuard } from './guards/auth.guard';
 import { nonAuthGuard } from './guards/non-auth.guard';
+import { OauthSelectRoleComponent } from './components/auth/oauth-select-role/oauth-select-role/oauth-select-role.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -18,6 +19,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [nonAuthGuard] },
   { path: 'host', component: HostComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
+  { path: 'select-role', component: OauthSelectRoleComponent, canActivate: [authGuard] },
   // Protected routes will be added as they are implemented
   // { path: 'bookings', component: BookingsComponent, canActivate: [authGuard] },
   // { path: 'spaces/my', component: MySpacesComponent, canActivate: [authGuard] },

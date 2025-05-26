@@ -1,0 +1,31 @@
+<!-- oauth-select-role.component.html -->
+<div class="role-selection-container">
+    <div class="role-selection-card">
+      <h2>Select Your Roles</h2>
+      <p class="instruction">Please select one or more roles to continue:</p>
+      
+      <!-- Improved roles list with better visibility -->
+      <div class="roles-list" *ngIf="availableRoles.length > 0">
+        <div *ngFor="let role of availableRoles" class="role-item">
+          <label [class.selected]="selectedRoles.includes(role)">
+            <input type="checkbox" 
+                   [checked]="selectedRoles.includes(role)" 
+                   (change)="toggleRoleSelection(role)">
+            <span class="role-name">{{ role }}</span>
+          </label>
+        </div>
+      </div>
+  
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+  
+      <div class="action-buttons">
+        <button class="submit-button" 
+                (click)="submitRoles()" 
+                [disabled]="isSubmitting || selectedRoles.length === 0">
+          {{ isSubmitting ? 'Submitting...' : 'Continue' }}
+        </button>
+      </div>
+    </div>
+  </div>

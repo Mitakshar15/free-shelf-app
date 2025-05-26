@@ -7,8 +7,8 @@ export interface User {
   phoneNumber?: string;
   status: 'PENDING' | 'ACTIVE' | 'SUSPENDED' | 'DEACTIVATED';
   // Changed from single role to roles array to match the API response
-  roles?: ('HOST' | 'RENTER' | 'ADMIN')[];
-  role?: 'HOST' | 'RENTER' | 'ADMIN'; // Keep for backward compatibility
+  roles?: ('HOST' | 'RENTER' | 'ADMIN' | 'UNASSIGNED')[];
+  role?: 'HOST' | 'RENTER' | 'ADMIN' | 'UNASSIGNED'; // Keep for backward compatibility
   profile?: UserProfile;
   lastLoginAt?: string;
   accountVerified?: boolean;
