@@ -217,10 +217,15 @@ export class AuthService {
   }
 
   // Cache for the current user
-  private currentUser: User | null = null;
+  public currentUser: User | null = null;
   private userRequestInProgress = false;
   private maxRetries = 3;
   private retryCount = 0;
+
+  // Get the current user data directly from cache
+  getCurrentUserValue(): User | null {
+    return this.currentUser;
+  }
 
   /**
    * Get the current user information from the backend
@@ -269,15 +274,15 @@ export class AuthService {
     // Make the request to the backend
     return this.http.get<ApiResponse<User>>(`${this.baseUrl}/user`, this.getAuthOptions())
       .pipe(
-        map(response => {
+        tap(response => {
           console.log('AuthService - getCurrentUser response:', response);
           // Reset retry count on success
           this.retryCount = 0;
           // Cache the user data
           this.currentUser = response && response.data ? response.data : null;
           this.userRequestInProgress = false;
-          return this.currentUser;
         }),
+        map(response => this.currentUser),
         catchError(error => {
           console.error('AuthService - Error getting current user:', error);
           this.userRequestInProgress = false;

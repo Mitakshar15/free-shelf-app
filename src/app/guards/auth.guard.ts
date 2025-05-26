@@ -6,14 +6,26 @@ export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
   
-  if (authService.isAuthenticated()) {
+  // Check if user is authenticated
+  if (!authService.isAuthenticated()) {
+    // Store the attempted URL for redirecting after login
+    router.navigate(['/login'], { 
+      queryParams: { returnUrl: state.url }
+    });
+    return false;
+  }
+
+  // Get current user's roles
+  const user = authService.getCurrentUserValue();
+  if (user && user.roles && user.roles.includes('UNASSIGNED')) {
+    // If user has UNASSIGNED role and is not on the role selection page
+    if (state.url !== '/select-role') {
+      router.navigate(['/select-role']);
+      return false;
+    }
     return true;
   }
-  
-  // Store the attempted URL for redirecting after login
-  router.navigate(['/login'], { 
-    queryParams: { returnUrl: state.url }
-  });
-  
-  return false;
+
+  // Allow access to all other routes for authenticated users with assigned roles
+  return true;
 };

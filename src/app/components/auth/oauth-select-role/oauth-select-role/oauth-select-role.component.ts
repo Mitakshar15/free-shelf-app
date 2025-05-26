@@ -78,10 +78,18 @@ export class OauthSelectRoleComponent implements OnInit {
     }).subscribe({
       next: (response: any) => {
         if (response && response.status?.statusCode === 200) {
+          // Clear the current user cache and refresh
+          this.authService.currentUser = null;
+          
           // Update user's role status in auth service
-          this.authService.getCurrentUser().subscribe();
-          // Navigate to homepage after successful role selection
-          this.router.navigate(['/home']);
+          this.authService.getCurrentUser().subscribe(user => {
+            if (user) {
+              // Ensure the user data is properly cached
+              this.authService.currentUser = user;
+              // Navigate to homepage after successful role selection
+              this.router.navigate(['/home']);
+            }
+          });
         } else {
           this.errorMessage = response.message || 'Failed to update roles. Please try again.';
         }
