@@ -67,6 +67,14 @@ export class StorageSpaceService {
     );
   }
 
+
+  getFeaturedSpaced(): Observable<ApiResponse<StorageSpace[]>> {
+    return this.http.get<ApiResponse<StorageSpace[]>>(
+      `${this.apiUrl}/featured`,
+      { headers: this.authService.getAuthHeaders() }
+    );
+  }
+
   addStorageSpaceImages(storageSpaceId: number, images: File[], captions?: string[]): Observable<ApiResponse<SpaceImage[]>> {
     const formData = new FormData();
     
@@ -96,4 +104,6 @@ export class StorageSpaceService {
       { headers: this.authService.getAuthHeaders() }
     );
   }
+
+
 }
