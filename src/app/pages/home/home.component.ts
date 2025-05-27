@@ -30,7 +30,7 @@ export class HomeComponent implements OnInit {
 
   loadFeaturedSpaces(): void {
     this.isLoading = true;
-    this.storageSpaceService.getStorageSpaces().subscribe({
+    this.storageSpaceService.getFeaturedSpaced().subscribe({
       next: (response) => {
         if (response.data) {
           // Filter for active spaces and take the first 6
