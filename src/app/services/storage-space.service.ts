@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { 
-  StorageSpace, 
-  ApiResponse, 
+import {
+  StorageSpace,
+  ApiResponse,
   CreateStorageSpaceRequest,
   UpdateAvailabilityPeriodRequest,
   FindNearestStorageSpaceRequest,
@@ -15,7 +15,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class StorageSpaceService {
-  private apiUrl = 'http://localhost:8080/v1/storagespace';
+  private apiUrl = 'https://freeshelf-10t4.onrender.com/v1/storagespace';
 
   constructor(
     private http: HttpClient,
@@ -41,7 +41,7 @@ export class StorageSpaceService {
     return this.http.put<ApiResponse<any>>(
       this.apiUrl,
       {},
-      { 
+      {
         headers: this.authService.getAuthHeaders(),
         params: { spaceId: spaceId.toString() }
       }
@@ -52,7 +52,7 @@ export class StorageSpaceService {
     return this.http.post<ApiResponse<any>>(
       `${this.apiUrl}/updateAvailability`,
       request,
-      { 
+      {
         headers: this.authService.getAuthHeaders(),
         params: { spaceId: spaceId.toString() }
       }
@@ -77,7 +77,7 @@ export class StorageSpaceService {
 
   addStorageSpaceImages(storageSpaceId: number, images: File[], captions?: string[]): Observable<ApiResponse<SpaceImage[]>> {
     const formData = new FormData();
-    
+
     images.forEach((image, index) => {
       formData.append('images', image);
     });
@@ -90,7 +90,7 @@ export class StorageSpaceService {
     return this.http.post<ApiResponse<SpaceImage[]>>(
       `${this.apiUrl}/addImages/${storageSpaceId}`,
       formData,
-      { 
+      {
         headers: this.authService.getAuthHeaders(),
         params
       }

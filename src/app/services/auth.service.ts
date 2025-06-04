@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { tap, map, catchError } from 'rxjs/operators';
-import { 
-  SignUpRequest, 
-  SignInRequest, 
-  ApiResponse, 
+import {
+  SignUpRequest,
+  SignInRequest,
+  ApiResponse,
   User
 } from '../models/models';
 import { CookieService } from './cookie.service';
@@ -15,19 +15,19 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class AuthService {
-  public baseUrl = 'http://localhost:8080/v1'
-  private apiUrl = 'http://localhost:8080/v1/auth';
-  private oauthUrl = 'http://localhost:8080/oauth2/authorize';
+  public baseUrl = 'https://freeshelf-10t4.onrender.com'
+  private apiUrl = 'https://freeshelf-10t4.onrender.com/v1/auth';
+  private oauthUrl = 'https://freeshelf-10t4.onrender.com/oauth2/authorize';
   private tokenKey = 'free-shelf-token';
   private authStateSubject = new BehaviorSubject<boolean>(false);
-  
+
   // Observable for components to subscribe to authentication state changes
   public authState$ = this.authStateSubject.asObservable();
 
   constructor(
     private http: HttpClient,
     private cookieService: CookieService,
-    private router: Router  
+    private router: Router
   ) {
     // Initialize auth state based on token existence
     this.authStateSubject.next(this.isAuthenticated());
@@ -35,11 +35,11 @@ export class AuthService {
     this.getCurrentUser().subscribe(user => {
       if (user) {
         const hasUnassignedRole = user.roles && user.roles.includes('UNASSIGNED');
-        
+
         // Check if user needs to select roles
         if (hasUnassignedRole) {
           // If at home or oauth callback, redirect to role selection
-          if (window.location.pathname === '/home' || 
+          if (window.location.pathname === '/home' ||
               window.location.pathname === '/oauth/callback') {
             console.log('User has UNASSIGNED role, redirecting to role selection');
             this.router.navigate(['/select-role']);
@@ -117,7 +117,7 @@ export class AuthService {
     return !!token;
   }
 
-  
+
   /**
    * Check authentication status directly from the backend
    * This is useful when cookies are HttpOnly and can't be read by JavaScript
@@ -147,7 +147,7 @@ export class AuthService {
       'Authorization': token ? `Bearer ${token}` : ''
     });
   }
-  
+
   /**
    * Create HTTP options with credentials for all requests
    * This ensures cookies are sent with every request
@@ -167,23 +167,23 @@ export class AuthService {
     const state = this.generateRandomState();
     // Store state in localStorage to verify when the user returns
     localStorage.setItem('oauth_state', state);
-    
+
     // Construct the full OAuth URL with redirect back to our application
     const redirectUri = encodeURIComponent(`${window.location.origin}/oauth/callback`);
     const oauthUrl = `${this.oauthUrl}/google?redirect_uri=${redirectUri}&state=${state}`;
-    
+
     // Redirect to the OAuth provider
     window.location.href = oauthUrl;
   }
-  
+
   /**
    * Generates a random state parameter for OAuth security
    */
   private generateRandomState(): string {
-    return Math.random().toString(36).substring(2, 15) + 
+    return Math.random().toString(36).substring(2, 15) +
            Math.random().toString(36).substring(2, 15);
   }
-  
+
   /**
    * Verifies the OAuth state parameter to prevent CSRF attacks
    */
@@ -205,7 +205,7 @@ export class AuthService {
       console.log('AuthService - Setting token from OAuth callback');
       this.setToken(token);
       this.authStateSubject.next(true);
-      
+
       // Verify the token was set correctly
       setTimeout(() => {
         const storedToken = this.cookieService.getCookie(this.tokenKey);
@@ -237,13 +237,13 @@ export class AuthService {
       console.log('AuthService - Returning cached user data');
       return of(this.currentUser);
     }
-    
+
     // If we're not authenticated, return null
     if (!this.isAuthenticated()) {
       console.log('AuthService - Not authenticated, returning null');
       return of(null);
     }
-    
+
     // If we've exceeded max retries, return a mock user for development to prevent redirect loops
     // This is a temporary solution to prevent redirect loops during development
     if (this.retryCount >= this.maxRetries) {
@@ -260,17 +260,17 @@ export class AuthService {
       this.currentUser = mockUser;
       return of(mockUser);
     }
-    
+
     // If there's already a request in progress, return null but increment retry count
     if (this.userRequestInProgress) {
       console.log('AuthService - User request already in progress, returning null');
       this.retryCount++;
       return of(null);
     }
-    
+
     // Mark that we're making a request
     this.userRequestInProgress = true;
-    
+
     // Make the request to the backend
     return this.http.get<ApiResponse<User>>(`${this.baseUrl}/user`, this.getAuthOptions())
       .pipe(
@@ -298,7 +298,7 @@ export class AuthService {
     if (!token) {
       throw new Error('Authentication token not found');
     }
-    
+
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });

@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { 
-  User, 
-  Address, 
-  ApiResponse, 
-  UpdateProfileRequest, 
-  AddNewAddressRequest, 
-  EditAddressRequest 
+import {
+  User,
+  Address,
+  ApiResponse,
+  UpdateProfileRequest,
+  AddNewAddressRequest,
+  EditAddressRequest
 } from '../models/models';
 import { AuthService } from './auth.service';
 
@@ -15,12 +15,12 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:8080/v1/user';
+  private apiUrl = 'https://freeshelf-10t4.onrender.com/v1/user';
 
   constructor(
     private http: HttpClient,
     private authService: AuthService,
-    
+
   ) { }
 
   getUserProfile(): Observable<ApiResponse<User>> {
@@ -29,7 +29,7 @@ export class UserService {
       { headers: this.authService.getAuthHeaders() }
     );
   }
-  
+
 
   updateUserProfile(updateProfileRequest: UpdateProfileRequest): Observable<ApiResponse<any>> {
     return this.http.put<ApiResponse<any>>(
@@ -65,7 +65,7 @@ export class UserService {
   deleteAddress(addressId: number): Observable<ApiResponse<any>> {
     return this.http.delete<ApiResponse<any>>(
       `${this.apiUrl}/address`,
-      { 
+      {
         headers: this.authService.getAuthHeaders(),
         params: { addressId: addressId.toString() }
       }

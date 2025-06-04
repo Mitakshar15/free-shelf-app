@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { 
-  Booking, 
-  ApiResponse, 
-  BookingRequest 
+import {
+  Booking,
+  ApiResponse,
+  BookingRequest
 } from '../models/models';
 import { AuthService } from './auth.service';
 
@@ -12,7 +12,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class BookingService {
-  private apiUrl = 'http://localhost:8080/v1/storagespace/booking';
+  private apiUrl = 'https://freeshelf-10t4.onrender.com/v1/storagespace/booking';
 
   constructor(
     private http: HttpClient,
@@ -46,7 +46,7 @@ export class BookingService {
     return this.http.put<ApiResponse<any>>(
       `${this.apiUrl}/accept`,
       {},
-      { 
+      {
         headers: this.authService.getAuthHeaders(),
         params: { bookingId: bookingId.toString() }
       }
@@ -57,7 +57,7 @@ export class BookingService {
     return this.http.put<ApiResponse<any>>(
       `${this.apiUrl}/reject`,
       {},
-      { 
+      {
         headers: this.authService.getAuthHeaders(),
         params: { bookingId: bookingId.toString() }
       }
