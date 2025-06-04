@@ -37,18 +37,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   loadFeaturedSpaces(): void {
     const now = Date.now();
-    
-    // Return cached data if it's still fresh
-    if (this.cachedSpaces.length > 0 && (now - this.lastFetchTime) < this.CACHE_DURATION) {
-      this.featuredSpaces = this.cachedSpaces;
-      this.isLoading = false;
-      this.cdr.markForCheck();
-      return;
-    }
-
     this.isLoading = true;
     this.error = '';
-    
+
     this.storageSpaceService.getFeaturedSpaced()
       .pipe(
         takeUntil(this.destroy$),
