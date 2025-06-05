@@ -272,7 +272,7 @@ export class AuthService {
     this.userRequestInProgress = true;
 
     // Make the request to the backend
-    return this.http.get<ApiResponse<User>>(`${this.baseUrl}/user`, this.getAuthOptions())
+    return this.http.get<ApiResponse<User>>(`${this.baseUrl}/v1/user`, this.getAuthOptions())
       .pipe(
         tap(response => {
           console.log('AuthService - getCurrentUser response:', response);
