@@ -15,9 +15,9 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class AuthService {
-  public baseUrl = 'https://freeshelf-10t4.onrender.com'
-  private apiUrl = 'https://freeshelf-10t4.onrender.com/v1/auth';
-  private oauthUrl = 'https://freeshelf-10t4.onrender.com/oauth2/authorize';
+  public baseUrl = 'http://localhost:8080/v1'
+  private apiUrl = 'http://localhost:8080/v1/auth';
+  private oauthUrl = 'http://localhost:8080/oauth2/authorize';
   private tokenKey = 'free-shelf-token';
   private authStateSubject = new BehaviorSubject<boolean>(false);
 

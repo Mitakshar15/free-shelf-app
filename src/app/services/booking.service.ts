@@ -12,7 +12,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class BookingService {
-  private apiUrl = 'https://freeshelf-10t4.onrender.com/v1/storagespace/booking';
+  private apiUrl = 'http://localhost:8080/v1/storagespace/booking';
 
   constructor(
     private http: HttpClient,

@@ -15,7 +15,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class StorageSpaceService {
-  private apiUrl = 'https://freeshelf-10t4.onrender.com/v1/storagespace';
+  private apiUrl = 'http://localhost:8080/v1/storagespace';
 
   constructor(
     private http: HttpClient,
