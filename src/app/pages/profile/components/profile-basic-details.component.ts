@@ -20,7 +20,7 @@ export class ProfileBasicDetailsComponent implements OnInit {
   isSubmitting = false;
   successMessage: string | null = null;
   errorMessage: string | null = null;
-  
+
   constructor(
     private fb: FormBuilder,
     private userService: UserService
@@ -40,8 +40,7 @@ export class ProfileBasicDetailsComponent implements OnInit {
     this.profileForm = this.fb.group({
       firstName: ['', Validators.required],
       lastName: [''],
-      bio: [''],
-      profileImageUrl: ['']
+      bio: ['']
     });
 
     if (this.user) {
@@ -53,8 +52,7 @@ export class ProfileBasicDetailsComponent implements OnInit {
     this.profileForm.patchValue({
       firstName: this.user?.firstName || '',
       lastName: this.user?.lastName || '',
-      bio: this.user?.profile?.bio || '',
-      profileImageUrl: this.user?.profile?.profileImageUrl || ''
+      bio: this.user?.profile?.bio || ''
     });
   }
 
@@ -78,7 +76,6 @@ export class ProfileBasicDetailsComponent implements OnInit {
       firstName: this.profileForm.value.firstName,
       lastName: this.profileForm.value.lastName,
       bio: this.profileForm.value.bio,
-      profileImageUrl: this.profileForm.value.profileImageUrl
     };
 
     this.userService.updateUserProfile(updateRequest).subscribe({

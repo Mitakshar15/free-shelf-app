@@ -70,14 +70,18 @@
     </div>
   </div>
 
+
+
+
+
   <!-- Edit mode -->
   <div *ngIf="isEditing" class="profile-edit">
     <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="firstName">First Name*</label>
-        <input 
-          type="text" 
-          id="firstName" 
+        <input
+          type="text"
+          id="firstName"
           formControlName="firstName"
           class="form-control"
           [ngClass]="{'invalid': profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched}"
@@ -89,32 +93,34 @@
 
       <div class="form-group">
         <label for="lastName">Last Name</label>
-        <input 
-          type="text" 
-          id="lastName" 
+        <input
+          type="text"
+          id="lastName"
           formControlName="lastName"
           class="form-control"
         >
       </div>
 
-      <div class="form-group">
-        <label for="profileImageUrl">Profile Image URL</label>
-        <input 
-          type="text" 
-          id="profileImageUrl" 
-          formControlName="profileImageUrl"
-          class="form-control"
-          placeholder="https://example.com/your-image.jpg"
-        >
-        <div class="image-preview" *ngIf="profileForm.get('profileImageUrl')?.value">
-          <img [src]="profileForm.get('profileImageUrl')?.value" alt="Profile image preview">
-        </div>
-      </div>
+<!--      <div class="form-group">-->
+<!--        <label for="profileImageUrl">Profile Image URL</label>-->
+<!--        <input -->
+<!--          type="text" -->
+<!--          id="profileImageUrl" -->
+<!--          formControlName="profileImageUrl"-->
+<!--          class="form-control"-->
+<!--          placeholder="https://example.com/your-image.jpg"-->
+<!--        >-->
+<!--        <div class="image-preview" *ngIf="profileForm.get('profileImageUrl')?.value">-->
+<!--          <img [src]="profileForm.get('profileImageUrl')?.value" alt="Profile image preview">-->
+<!--        </div>-->
+<!--      </div>-->
+
+
 
       <div class="form-group">
         <label for="bio">Bio</label>
-        <textarea 
-          id="bio" 
+        <textarea
+          id="bio"
           formControlName="bio"
           class="form-control"
           rows="4"
@@ -123,9 +129,9 @@
       </div>
 
       <div class="form-actions">
-        <button 
-          type="submit" 
-          class="btn-save" 
+        <button
+          type="submit"
+          class="btn-save"
           [disabled]="profileForm.invalid || isSubmitting"
         >
           <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
