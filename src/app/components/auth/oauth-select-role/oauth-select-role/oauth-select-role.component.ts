@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../../../services/auth.service';
 import { CommonModule } from '@angular/common';
+import {ApiService} from '../../../../services/api.service';
+import {API_CONFIG} from '../../../../config/api.config';
 
 @Component({
   selector: 'app-oauth-select-role',
@@ -21,7 +23,8 @@ export class OauthSelectRoleComponent implements OnInit {
   constructor(
     private router: Router,
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private api: ApiService
   ) {
     console.log('OauthSelectRoleComponent initialized');
   }
@@ -29,18 +32,18 @@ export class OauthSelectRoleComponent implements OnInit {
   ngOnInit(): void {
     console.log('OauthSelectRoleComponent ngOnInit called');
     console.log('Available roles:', this.availableRoles);
-    
+
     // Check if user is authenticated
     if (!this.authService.isAuthenticated()) {
       this.router.navigate(['/login']);
       return;
     }
-    
+
     // Get current user's roles to pre-select them
-    this.authService.getCurrentUser().subscribe(user => {
-      if (user && user.roles) {
-        this.selectedRoles = user.roles.filter(role => 
-          this.availableRoles.includes(role) && 
+    this.authService.getCurrentUser().subscribe(response => {
+      if (response && response.data.roles) {
+        this.selectedRoles = response.data.roles.filter((role: string) =>
+          this.availableRoles.includes(role) &&
           role !== 'UNASSIGNED'
         );
       }
@@ -70,7 +73,7 @@ export class OauthSelectRoleComponent implements OnInit {
       'Authorization': `Bearer ${token}`
     });
 
-    this.http.put(`${this.authService.baseUrl}/user/role`, {}, {
+    this.api.put(API_CONFIG.ENDPOINTS.USER.ADD_ROLE, {}, {
       headers: headers,
       params: {
         'Roles': this.selectedRoles
@@ -78,15 +81,10 @@ export class OauthSelectRoleComponent implements OnInit {
     }).subscribe({
       next: (response: any) => {
         if (response && response.status?.statusCode === 200) {
-          // Clear the current user cache and refresh
           this.authService.currentUser = null;
-          
-          // Update user's role status in auth service
           this.authService.getCurrentUser().subscribe(user => {
             if (user) {
-              // Ensure the user data is properly cached
               this.authService.currentUser = user;
-              // Navigate to homepage after successful role selection
               this.router.navigate(['/home']);
             }
           });

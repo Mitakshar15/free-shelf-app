@@ -27,6 +27,7 @@
           {{ user?.firstName?.charAt(0) || user?.email?.charAt(0) | uppercase }}
         </div>
       </div>
+        <button (click)="openEditProfile()">icon</button>
       <div class="profile-details">
         <div class="profile-name">
           {{ user?.firstName }} {{ user?.lastName }}
@@ -36,6 +37,61 @@
         </div>
         <div class="profile-role">
           <span class="role-badge" *ngFor="let role of user?.roles">{{ role }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Backdrop -->
+    <div *ngIf="proflePicFlag" class="modal-backdrop" (click)="closeModal()">
+
+      <!-- Modal Container -->
+      <div class="modal-container" (click)="$event.stopPropagation()">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h3>Upload Profile Picture</h3>
+          <button class="close-btn" (click)="closeModal()">&times;</button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+          <div class="upload-area"
+               [class.dragover]="isDragOver"
+               (dragover)="onDragOver($event)"
+               (dragleave)="onDragLeave($event)"
+               (drop)="onDrop($event)">
+
+            <div *ngIf="!selectedImage" class="upload-placeholder">
+              <i class="upload-icon">📷</i>
+              <p>Drag & drop an image here or click to browse</p>
+              <input type="file"
+                     #fileInput
+                     accept="image/*"
+                     (change)="onFileSelected($event)"
+                     style="display: none;">
+              <button class="browse-btn" (click)="fileInput.click()">Browse Files</button>
+            </div>
+
+            <div *ngIf="selectedImage" class="image-preview">
+              <img [src]="selectedImage" alt="Preview" class="preview-img">
+              <button class="remove-btn" (click)="removeImage()">&times;</button>
+            </div>
+          </div>
+
+          <div *ngIf="uploadError" class="error-message">
+            {{ uploadError }}
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+          <button class="btn btn-cancel" (click)="closeModal()">Cancel</button>
+          <button class="btn btn-upload"
+                  [disabled]="!selectedImage || isUploading"
+                  (click)="uploadImage()">
+            <span *ngIf="isUploading">Uploading...</span>
+            <span *ngIf="!isUploading">Upload</span>
+          </button>
         </div>
       </div>
     </div>
