@@ -3,6 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { UserService } from '../../../services/user.service';
 import { User, UpdateProfileRequest } from '../../../models/models';
+import {AuthService} from '../../../services/auth.service';
+import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
+import {finalize, throwError} from 'rxjs';
+import {catchError} from 'rxjs/operators';
 
 @Component({
   selector: 'app-profile-basic-details',
@@ -20,12 +24,137 @@ export class ProfileBasicDetailsComponent implements OnInit {
   isSubmitting = false;
   successMessage: string | null = null;
   errorMessage: string | null = null;
-
+  proflePicFlag: boolean = false;
+  selectedImage: string | null = null;
+  selectedFile: File | null = null;
+  isDragOver = false;
+  isUploading = false;
+  uploadError = '';
   constructor(
     private fb: FormBuilder,
-    private userService: UserService
+    private userService: UserService,
+    private authService: AuthService,
+    private http: HttpClient,
   ) {}
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.handleFile(input.files[0]);
+    }
+  }
 
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragOver = true;
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragOver = false;
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragOver = false;
+
+    const files = event.dataTransfer?.files;
+    if (files && files[0]) {
+      this.handleFile(files[0]);
+    }
+  }
+
+  handleFile(file: File): void {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      this.uploadError = 'Please select a valid image file.';
+      return;
+    }
+
+    // Validate file size (e.g., max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      this.uploadError = 'File size must be less than 5MB.';
+      return;
+    }
+
+    this.uploadError = '';
+    this.selectedFile = file;
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.selectedImage = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(): void {
+    this.selectedImage = null;
+    this.selectedFile = null;
+    this.uploadError = '';
+  }
+
+  uploadImage(): void {
+    if (!this.selectedFile) return;
+
+    this.isUploading = true;
+    this.uploadError = '';
+
+    const formData = new FormData();
+    formData.append('image', this.selectedFile);
+
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    this.http.put(this.authService.baseUrl+'/user/profilepic', formData, { headers })
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          console.error('Upload failed:', error);
+
+          if (error.status === 401) {
+            this.uploadError = 'Authentication failed. Please login again.';
+          } else if (error.status === 413) {
+            this.uploadError = 'File too large. Please select a smaller image.';
+          } else if (error.status === 415) {
+            this.uploadError = 'Unsupported file type. Please select a valid image.';
+          } else if (error.status === 0) {
+            this.uploadError = 'Network error. Please check your connection.';
+          } else {
+            this.uploadError = error.error?.message || 'Upload failed. Please try again.';
+          }
+
+          return throwError(error);
+        }),
+        finalize(() => {
+          this.isUploading = false;
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          console.log('Profile picture updated successfully:', response);
+          this.proflePicFlag = false;
+          this.resetModal();
+          // Optional: Show success message
+        },
+        error: (error) => {
+          // Error already handled in catchError
+        }
+      });
+  }
+
+  closeModal(): void {
+    this.proflePicFlag = false;
+    this.resetModal();
+  }
+
+  private resetModal(): void {
+    this.selectedImage = null;
+    this.selectedFile = null;
+    this.uploadError = '';
+    this.isDragOver = false;
+    this.isUploading = false;
+  }
   ngOnInit(): void {
     this.initForm();
   }
@@ -34,6 +163,10 @@ export class ProfileBasicDetailsComponent implements OnInit {
     if (this.user && this.profileForm) {
       this.updateFormValues();
     }
+  }
+
+  openEditProfile(): void {
+    this.proflePicFlag = !this.proflePicFlag;
   }
 
   private initForm(): void {
