@@ -23,7 +23,8 @@ import { UserService } from '../../services/user.service';
 export class HostComponent implements OnInit {
   currentStep = 1;
   totalSteps = 3;
-  
+  private current_user: any | null;
+
   constructor(
     private router: Router,
     private authService: AuthService,
@@ -31,11 +32,11 @@ export class HostComponent implements OnInit {
 
   ngOnInit(): void {
     // Check if user has HOST role, but only redirect if we're certain they don't
-    this.authService.getCurrentUser().subscribe(user => {
-      if (user) {
+    this.authService.getCurrentUser().subscribe(response => {
+      if (response) {
         // We have a user, check if they have HOST role
-        const isHost = this.hasHostRole(user);
-        
+        const isHost = this.hasHostRole(response.data.user.roles);
+
         if (!isHost) {
           console.log('User does not have HOST role, redirecting to become-host page');
           this.router.navigate(['/become-host']);
@@ -46,9 +47,9 @@ export class HostComponent implements OnInit {
         // If we don't have a user yet, don't redirect - the auth service will handle retries
         console.log('No user data yet, waiting for auth service to retry');
       }
-    });
+     });
   }
-  
+
   /**
    * Check if the user has the HOST role
    * @param user The user to check
@@ -59,12 +60,12 @@ export class HostComponent implements OnInit {
     if (user.roles && Array.isArray(user.roles)) {
       return user.roles.includes('HOST');
     }
-    
+
     // Fallback to the role property (old format)
     if (user.role) {
       return user.role === 'HOST';
     }
-    
+
     return false;
   }
 

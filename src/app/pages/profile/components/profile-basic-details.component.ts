@@ -7,6 +7,8 @@ import {AuthService} from '../../../services/auth.service';
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {finalize, throwError} from 'rxjs';
 import {catchError} from 'rxjs/operators';
+import {ApiService} from '../../../services/api.service';
+import {API_CONFIG} from '../../../config/api.config';
 
 @Component({
   selector: 'app-profile-basic-details',
@@ -35,6 +37,7 @@ export class ProfileBasicDetailsComponent implements OnInit {
     private userService: UserService,
     private authService: AuthService,
     private http: HttpClient,
+    private api: ApiService
   ) {}
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -107,7 +110,7 @@ export class ProfileBasicDetailsComponent implements OnInit {
       'Authorization': `Bearer ${token}`
     });
 
-    this.http.put(this.authService.baseUrl+'/user/profilepic', formData, { headers })
+    this.api.put(API_CONFIG.ENDPOINTS.USER.UPDATE_PROFILE_PIC, formData, { headers })
       .pipe(
         catchError((error: HttpErrorResponse) => {
           console.error('Upload failed:', error);

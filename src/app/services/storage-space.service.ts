@@ -10,36 +10,36 @@ import {
   SpaceImage
 } from '../models/models';
 import { AuthService } from './auth.service';
+import {ApiService} from './api.service';
+import {API_CONFIG} from '../config/api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StorageSpaceService {
-  private apiUrl = 'http://localhost:8080/v1/storagespace';
-
   constructor(
-    private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private api: ApiService
   ) { }
 
   getStorageSpaces(): Observable<ApiResponse<StorageSpace[]>> {
-    return this.http.get<ApiResponse<StorageSpace[]>>(
-      this.apiUrl,
+    return this.api.get<ApiResponse<StorageSpace[]>>(
+     API_CONFIG.ENDPOINTS.STORAGE_SPACE.GET_MY_SPACES,
       { headers: this.authService.getAuthHeaders() }
     );
   }
 
   createStorageSpace(request: CreateStorageSpaceRequest): Observable<ApiResponse<StorageSpace[]>> {
-    return this.http.post<ApiResponse<StorageSpace[]>>(
-      this.apiUrl,
+    return this.api.post<ApiResponse<StorageSpace[]>>(
+      API_CONFIG.ENDPOINTS.STORAGE_SPACE.ADD_SPACE,
       request,
       { headers: this.authService.getAuthHeaders() }
     );
   }
 
   publishStorageSpace(spaceId: number): Observable<ApiResponse<any>> {
-    return this.http.put<ApiResponse<any>>(
-      this.apiUrl,
+    return this.api.put<ApiResponse<any>>(
+      API_CONFIG.ENDPOINTS.STORAGE_SPACE.PUBLISH_STORAGE_SPACE,
       {},
       {
         headers: this.authService.getAuthHeaders(),
@@ -49,8 +49,8 @@ export class StorageSpaceService {
   }
 
   updateAvailabilityPeriod(spaceId: number, request: UpdateAvailabilityPeriodRequest): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(
-      `${this.apiUrl}/updateAvailability`,
+    return this.api.post<ApiResponse<any>>(
+      API_CONFIG.ENDPOINTS.STORAGE_SPACE.UPDATE_SPACE_AVAILABILITY,
       request,
       {
         headers: this.authService.getAuthHeaders(),
@@ -60,8 +60,8 @@ export class StorageSpaceService {
   }
 
   findNearestStorageSpace(request: FindNearestStorageSpaceRequest): Observable<ApiResponse<StorageSpace[]>> {
-    return this.http.post<ApiResponse<StorageSpace[]>>(
-      `${this.apiUrl}/find`,
+    return this.api.post<ApiResponse<StorageSpace[]>>(
+      API_CONFIG.ENDPOINTS.STORAGE_SPACE.FIND_NEAREST_SPACE,
       request,
       { headers: this.authService.getAuthHeaders() }
     );
@@ -69,26 +69,23 @@ export class StorageSpaceService {
 
 
   getFeaturedSpaced(): Observable<ApiResponse<StorageSpace[]>> {
-    return this.http.get<ApiResponse<StorageSpace[]>>(
-      `${this.apiUrl}/featured`,
+    return this.api.get<ApiResponse<StorageSpace[]>>(
+      API_CONFIG.ENDPOINTS.STORAGE_SPACE.GET_FEATURED_SPACES,
       { headers: this.authService.getAuthHeaders() }
     );
   }
 
   addStorageSpaceImages(storageSpaceId: number, images: File[], captions?: string[]): Observable<ApiResponse<SpaceImage[]>> {
     const formData = new FormData();
-
     images.forEach((image, index) => {
       formData.append('images', image);
     });
-
     let params: any = {};
     if (captions && captions.length > 0) {
       params.captions = captions;
     }
-
-    return this.http.post<ApiResponse<SpaceImage[]>>(
-      `${this.apiUrl}/addImages/${storageSpaceId}`,
+    return this.api.post<ApiResponse<SpaceImage[]>>(
+      API_CONFIG.ENDPOINTS.STORAGE_SPACE.ADD_SPACE_IMAGES(storageSpaceId),
       formData,
       {
         headers: this.authService.getAuthHeaders(),
@@ -98,8 +95,8 @@ export class StorageSpaceService {
   }
 
   setImageAsPrimary(spaceId: number, imageId: number): Observable<ApiResponse<SpaceImage[]>> {
-    return this.http.put<ApiResponse<SpaceImage[]>>(
-      `${this.apiUrl}/${spaceId}/images/${imageId}`,
+    return this.api.put<ApiResponse<SpaceImage[]>>(
+      API_CONFIG.ENDPOINTS.STORAGE_SPACE.SET_PRIMARY_IMAGE(spaceId, imageId),
       {},
       { headers: this.authService.getAuthHeaders() }
     );

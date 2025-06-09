@@ -6,19 +6,18 @@ import {
   SignUpRequest,
   SignInRequest,
   ApiResponse,
-  User
+  User, UserProfile
 } from '../models/models';
 import { CookieService } from './cookie.service';
 import { Router } from '@angular/router';
+import {ApiService} from './api.service';
+import {API_CONFIG} from '../config/api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  public baseUrl = 'http://localhost:8080/v1'
-  private apiUrl = 'http://localhost:8080/v1/auth';
-  private oauthUrl = 'http://localhost:8080/oauth2/authorize';
-  private tokenKey = 'free-shelf-token';
+  private tokenKey = API_CONFIG.AUTH_TOKEN_KEY;
   private authStateSubject = new BehaviorSubject<boolean>(false);
 
   // Observable for components to subscribe to authentication state changes
@@ -27,23 +26,21 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private cookieService: CookieService,
-    private router: Router
+    private router: Router,
+    private api : ApiService
   ) {
     // Initialize auth state based on token existence
     this.authStateSubject.next(this.isAuthenticated());
 
-    this.getCurrentUser().subscribe(user => {
-      if (user) {
-        const hasUnassignedRole = user.roles && user.roles.includes('UNASSIGNED');
+    this.getCurrentUser().subscribe(response => {
+      if (response.data) {
+        const hasUnassignedRole = response.data.roles && response.data.roles.includes('UNASSIGNED');
 
         // Check if user needs to select roles
         if (hasUnassignedRole) {
           // If at home or oauth callback, redirect to role selection
-          if (window.location.pathname === '/home' ||
-              window.location.pathname === '/oauth/callback') {
             console.log('User has UNASSIGNED role, redirecting to role selection');
             this.router.navigate(['/select-role']);
-          }
         } else {
           // If at role selection page and user already has roles, redirect to home
           if (window.location.pathname === '/select-role') {
@@ -55,47 +52,40 @@ export class AuthService {
     });
   }
 
-  signUp(signUpRequest: SignUpRequest): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/signup`, signUpRequest, { withCredentials: true })
-      .pipe(
-        tap(response => {
-          console.log('AuthService - Processing signup response:', response);
-          // If the API returns a token on signup, store it and update auth state
-          if (response.data?.token) {
-            console.log('AuthService - Token found, setting token and updating auth state');
-            this.setToken(response.data.token);
-            this.authStateSubject.next(true);
-          } else {
-            console.log('AuthService - No token found in signup response');
-            // Check if we're authenticated anyway (cookie might be HttpOnly)
-            this.checkAuthStatus().subscribe();
-          }
-        })
-      );
+  signUp(request: SignUpRequest): Observable<ApiResponse<any>> {
+    return this.api.post<ApiResponse<any>>(API_CONFIG.ENDPOINTS.AUTH.REGISTER, request).pipe(
+      tap(response => {
+        if (response?.data?.token) {
+          console.log('AuthService - Token found, setting token and updating auth state');
+          this.setToken(response.data.token);
+          this.authStateSubject.next(true);
+        }
+        else {
+          console.log('AuthService - No token found in signin response');
+        }
+      })
+    );
   }
 
-  signIn(signInRequest: SignInRequest): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/signin`, signInRequest, { withCredentials: true })
-      .pipe(
-        tap(response => {
-          console.log('AuthService - Processing signin response:', response);
-          if (response.data?.token) {
-            console.log('AuthService - Token found in signin response');
-            this.setToken(response.data.token);
-            this.authStateSubject.next(true);
-          } else {
-            console.log('AuthService - No token found in signin response');
-            // Check if we're authenticated anyway (cookie might be HttpOnly)
-            this.checkAuthStatus().subscribe();
-          }
-        })
-      );
+  signIn(request: SignInRequest): Observable<ApiResponse<any>> {
+    return this.api.post<ApiResponse<any>>(API_CONFIG.ENDPOINTS.AUTH.LOGIN, request).pipe(
+      tap(response => {
+        if (response?.data?.token) {
+          localStorage.setItem(API_CONFIG.AUTH_TOKEN_KEY, response.data.token);
+          console.log('AuthService - Token found in signin response');
+          this.setToken(response.data.token);
+          this.authStateSubject.next(true);
+        }
+        else {
+          console.log('AuthService - No token found in signin response');
+        }
+      })
+    );
   }
 
   logout(): void {
     this.cookieService.deleteCookie(this.tokenKey);
     this.authStateSubject.next(false);
-    // Clear the cached user data
     this.currentUser = null;
   }
 
@@ -117,29 +107,6 @@ export class AuthService {
     return !!token;
   }
 
-
-  /**
-   * Check authentication status directly from the backend
-   * This is useful when cookies are HttpOnly and can't be read by JavaScript
-   */
-  checkAuthStatus(): Observable<boolean> {
-    console.log('AuthService - Checking auth status from backend');
-    return this.http.get<ApiResponse<{authenticated: boolean}>>(`${this.apiUrl}/status`, { withCredentials: true })
-      .pipe(
-        tap(response => {
-          console.log('AuthService - Auth status response:', response);
-          // Update auth state based on response
-          if (response && response.data) {
-            const isAuthenticated = response.data.authenticated === true;
-            this.authStateSubject.next(isAuthenticated);
-          }
-        }),
-        // Map the response to a boolean value
-        map((response: ApiResponse<{authenticated: boolean}>) => {
-          return response && response.data ? response.data.authenticated === true : false;
-        })
-      )
-  }
 
   getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
@@ -170,9 +137,7 @@ export class AuthService {
 
     // Construct the full OAuth URL with redirect back to our application
     const redirectUri = encodeURIComponent(`${window.location.origin}/oauth/callback`);
-    const oauthUrl = `${this.oauthUrl}/google?redirect_uri=${redirectUri}&state=${state}`;
-
-    // Redirect to the OAuth provider
+    const oauthUrl = API_CONFIG.OAUTH_ENDPOINT+`/google?redirect_uri=${redirectUri}&state=${state}`;
     window.location.href = oauthUrl;
   }
 
@@ -217,7 +182,7 @@ export class AuthService {
   }
 
   // Cache for the current user
-  public currentUser: User | null = null;
+  public currentUser: any | null = null;
   private userRequestInProgress = false;
   private maxRetries = 3;
   private retryCount = 0;
@@ -227,70 +192,22 @@ export class AuthService {
     return this.currentUser;
   }
 
-  /**
-   * Get the current user information from the backend
-   * @returns Observable with the current user data
-   */
-  getCurrentUser(): Observable<User | null> {
-    // If we already have the user data cached, return it
-    if (this.currentUser) {
-      console.log('AuthService - Returning cached user data');
-      return of(this.currentUser);
+  getCurrentUser(): Observable<ApiResponse<any>> {
+    const token = this.getToken();
+    if (!token) {
+      return of({ data: null as unknown as UserProfile } as ApiResponse<any>);
     }
 
-    // If we're not authenticated, return null
-    if (!this.isAuthenticated()) {
-      console.log('AuthService - Not authenticated, returning null');
-      return of(null);
-    }
-
-    // If we've exceeded max retries, return a mock user for development to prevent redirect loops
-    // This is a temporary solution to prevent redirect loops during development
-    if (this.retryCount >= this.maxRetries) {
-      console.log('AuthService - Max retries exceeded, returning mock user');
-      // Create a mock user with HOST role to prevent redirect loops
-      const mockUser: User = {
-        firstName: 'Test',
-        email: 'test@example.com',
-        userName: 'testuser',
-        roles: ['HOST'],  // Using roles array instead of single role
-        status: 'ACTIVE',
-        provider: 'LOCAL'
-      };
-      this.currentUser = mockUser;
-      return of(mockUser);
-    }
-
-    // If there's already a request in progress, return null but increment retry count
-    if (this.userRequestInProgress) {
-      console.log('AuthService - User request already in progress, returning null');
-      this.retryCount++;
-      return of(null);
-    }
-
-    // Mark that we're making a request
-    this.userRequestInProgress = true;
-
-    // Make the request to the backend
-    return this.http.get<ApiResponse<User>>(`${this.baseUrl}/v1/user`, this.getAuthOptions())
-      .pipe(
-        tap(response => {
-          console.log('AuthService - getCurrentUser response:', response);
-          // Reset retry count on success
-          this.retryCount = 0;
-          // Cache the user data
+    return this.api.get<ApiResponse<any>>(API_CONFIG.ENDPOINTS.USER.PROFILE,this.getAuthOptions()).pipe(
+      tap(response => {
+        if (response?.data) {
           this.currentUser = response && response.data ? response.data : null;
           this.userRequestInProgress = false;
-        }),
-        map(response => this.currentUser),
-        catchError(error => {
-          console.error('AuthService - Error getting current user:', error);
-          this.userRequestInProgress = false;
-          this.retryCount++;
-          return of(null);
-        })
-      );
+        }
+      })
+    );
   }
+
 
   setUserRoles(roles: any): Observable<any> {
 
@@ -303,13 +220,13 @@ export class AuthService {
       'Authorization': `Bearer ${token}`
     });
 
-    return this.http.put<ApiResponse<any>>(`${this.baseUrl}/v1/user/role`, {}, {
+    return this.api.put<ApiResponse<any>>(API_CONFIG.ENDPOINTS.USER.ADD_ROLE, {}, {
       headers: headers,
       params: roles
     }).pipe(
       tap(response => {
         if (response) {
-           console.log("ROLE ASSIGNED")
+          console.log("ROLE ASSIGNED")
         }
       })
     );
