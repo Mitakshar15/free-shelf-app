@@ -1,4 +1,4 @@
-const HOSTNAME= 'http://localhost:8080';
+const HOSTNAME= 'https://freeshelf-10t4.onrender.com';
 
 export const API_CONFIG = {
   BASE_URL: HOSTNAME +'/v1',
